@@ -1,0 +1,234 @@
+{
+  "main": {
+    "id": "5324373015726ba8",
+    "type": "split",
+    "children": [
+      {
+        "id": "4509724f8bf84da7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e7a7b303c61786dc",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Index"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a335a5a647255478",
+    "type": "split",
+    "children": [
+      {
+        "id": "fb16e8f564ae56c1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "78a59e29974bd18f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "4315c1040dd4e3d8",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "even",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "6e29b02118b3a91b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f0111ec23eb1b7ff",
+    "type": "split",
+    "children": [
+      {
+        "id": "fe67e6d6e26dec6c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bbe82e01c5a9749d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 00000"
+            }
+          },
+          {
+            "id": "53038210af4e1629",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 00000"
+            }
+          },
+          {
+            "id": "acd3335c003a92ea",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "0456a0c44cd297f7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 00000"
+            }
+          },
+          {
+            "id": "87c935f63fb5a885",
+            "type": "leaf",
+            "state": {
+              "type": "review-queue-list-view",
+              "state": {},
+              "icon": "SpacedRepIcon",
+              "title": "Notes Review Queue"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "templater-obsidian:Templater": false,
+      "obsidian-kanban:Create new board": false,
+      "homepage:Open homepage": false,
+      "obsidian-git:Open Git source control": false,
+      "obsidian-spaced-repetition:Review flashcards": false,
+      "pdf-plus:PDF++: Toggle auto-copy": false,
+      "pdf-plus:PDF++: Toggle auto-focus": false,
+      "pdf-plus:PDF++: Toggle auto-paste": false,
+      "modalforms:Edit forms": false,
+      "system3-relay:Relay": false
+    }
+  },
+  "active": "87c935f63fb5a885",
+  "lastOpenFiles": [
+    "Index.md",
+    "PROJECTS/Events/00000.md",
+    "PROJECTS/Valszám/ZH/2.zh/2014_05_A_Megoldas.pdf",
+    "PROJECTS/Valszám/valszám 2.zh feladatok.md",
+    "PROJECTS/Valszám/00000.md",
+    "PROJECTS/Valszám/valszám 2. zh.md",
+    "PROJECTS/Valszám/ZH/2.zh/2015_05_A_Megoldas.pdf",
+    "PROJECTS/Valszám/ZH/2.zh/2014_05_Javito_Megoldas.pdf",
+    "PROJECTS/Valszám/A valószínüségi változó várható értéke.md",
+    "PROJECTS/Valszám/A valószínűségi változó.md",
+    "PROJECTS/Valszám/A sürüségfüggvény.md",
+    "PROJECTS/Valszám/Eseményalgebra.md",
+    "PROJECTS/Valszám/Nevezetes diszkrét eloszlások.md",
+    "PROJECTS/Valszám/all_segedanyagok/Feladatok/ZH/1.zh/2015_03_A_B_Megldas.pdf",
+    "PROJECTS/Valszám/all_segedanyagok/Feladatok/ZH/1.zh/2014_03_A_Megoldas.pdf",
+    "PROJECTS/Valszám/all_segedanyagok/Feladatok/ZH/1.zh/2014_05_Javito_Megoldas (1).pdf",
+    "PROJECTS/Valszám/Feltételes valószínüség, függetlenség.md",
+    "PROJECTS/Markdown article/00000.md",
+    "PROJECTS/Markdown article",
+    "PROJECTS/BlackRock/CV.md",
+    "ARCHIVE/Korszar1/Szuperskalár.md",
+    "ARCHIVE/Korszar1/Cache.md",
+    "ARCHIVE/Korszar1/2.gen_szuperskalár.md",
+    "ARCHIVE/Korszar1/kidolgozas_6.pdf",
+    "ARCHIVE/Korszar1/Statements.md",
+    "ARCHIVE/Korszar1/nagy_jegyzet/Archi 2_abrak.pdf",
+    "ARCHIVE/Korszar1/vizsga_kerdesek.pdf",
+    "ARCHIVE/Korszar1/605537716_4326914007552479_8377555958941113459_n.jpg",
+    "ARCHIVE/Korszar1/Exam questions.md",
+    "ARCHIVE/Korszar1/00000.md",
+    "ARCHIVE/Korszar1/vizsga_kerdesek_elofordulasa.webp",
+    "ARCHIVE/Korszar1/ok-okozat.webp",
+    "505592909_4133826253527923_1388625542939523882_n.jpg",
+    "AREAS/University/00000.md",
+    "Untitled 2.md",
+    "PROJECTS/BlackRock/00000.md",
+    "PROJECTS/Final exam/00000.md"
+  ]
+}

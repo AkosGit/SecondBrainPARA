@@ -1,0 +1,244 @@
+{
+  "main": {
+    "id": "5324373015726ba8",
+    "type": "split",
+    "children": [
+      {
+        "id": "4509724f8bf84da7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e7a7b303c61786dc",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/Tételek-kidolgozva.pdf",
+                "page": 15,
+                "left": -13,
+                "top": 7,
+                "zoom": 1.2588205645161288
+              },
+              "icon": "lucide-file-text",
+              "title": "Tételek-kidolgozva"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a335a5a647255478",
+    "type": "split",
+    "children": [
+      {
+        "id": "fb16e8f564ae56c1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "78a59e29974bd18f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "4315c1040dd4e3d8",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "valszám",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "6e29b02118b3a91b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 357.5
+  },
+  "right": {
+    "id": "f0111ec23eb1b7ff",
+    "type": "split",
+    "children": [
+      {
+        "id": "fe67e6d6e26dec6c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bbe82e01c5a9749d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 00000"
+            }
+          },
+          {
+            "id": "53038210af4e1629",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 00000"
+            }
+          },
+          {
+            "id": "acd3335c003a92ea",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "0456a0c44cd297f7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "AREAS/University/00000.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 00000"
+            }
+          },
+          {
+            "id": "87c935f63fb5a885",
+            "type": "leaf",
+            "state": {
+              "type": "review-queue-list-view",
+              "state": {},
+              "icon": "SpacedRepIcon",
+              "title": "Notes Review Queue"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "templater-obsidian:Templater": false,
+      "obsidian-kanban:Create new board": false,
+      "homepage:Open homepage": false,
+      "obsidian-git:Open Git source control": false,
+      "obsidian-spaced-repetition:Review flashcards": false,
+      "pdf-plus:PDF++: Toggle auto-copy": false,
+      "pdf-plus:PDF++: Toggle auto-focus": false,
+      "pdf-plus:PDF++: Toggle auto-paste": false,
+      "modalforms:Edit forms": false,
+      "system3-relay:Relay": false
+    }
+  },
+  "active": "e7a7b303c61786dc",
+  "lastOpenFiles": [
+    "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/valszam_elmélet_kerdesek.pdf",
+    "PROJECTS/Valszám/00000.md",
+    "PROJECTS/taxes/Setup.md",
+    "PROJECTS/taxes/Monthly process.md",
+    "PROJECTS/taxes/00000.md",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/Tételek-kidolgozva.pdf",
+    "PROJECTS/taxes",
+    "Index.md",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/2015ösök.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/becskieg.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/CsebNsztCht_kepletek.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/EddigiElmeletiVizsgakerdesekKidolgozva.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/összes_elméleti_kérdés_üres.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/p152k2m.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/valsz_full.pdf",
+    "PROJECTS/Valszám/Vizsgák/Elmélet/Valszám Vizsga kérdések válaszokkal 2015.pdf",
+    "PROJECTS/Article writing/Deep research tools and benchmark.md",
+    "PROJECTS/Article writing/Transcript article.md",
+    "PROJECTS/Article writing/Agentic project.md",
+    "PROJECTS/Article writing/Extending your mind using LLMs part 1.md",
+    "Untitled 7.md",
+    "Untitled 8.md",
+    "PROJECTS/Valszám/Vizsgák/2016_06_10_4.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_4.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_3.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_2.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_1.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/megoldokulcs_1.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/feladat_2.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/feladat_1.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/2015_05_22_4.jpg",
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/2015_05_22_3.jpg",
+    "Time and time again.md",
+    "PROJECTS/João work/Market research strategies.md",
+    "PROJECTS/João work/TODO.md",
+    "PROJECTS/Valszám/Több eloszlás.md",
+    "poison binom.md",
+    "Untitled 1.md",
+    "Untitled.md",
+    "Untitled 2.md",
+    "Untitled 3.md",
+    "Untitled 4.md",
+    "Untitled 5.md",
+    "Untitled 6.md",
+    "PROJECTS/poems/00000.md",
+    "PROJECTS/Valszám/Feltételes valószínüség, függetlenség.md"
+  ]
+}
