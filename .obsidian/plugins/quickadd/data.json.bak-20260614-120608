@@ -1,36 +1,5 @@
 {
-  "choices": [
-    {
-      "id": "e7db0f0c-157d-4ecb-bd71-b7d959299276",
-      "name": "New Source",
-      "type": "Template",
-      "command": true,
-      "templatePath": "Templates/SourceTemplate.md",
-      "fileNameFormat": {
-        "enabled": true,
-        "format": "Untitled Source {{DATE:YYYYMMDDHHmmss}}"
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "Inbox"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false,
-        "chooseFromSubfolders": false
-      },
-      "appendLink": false,
-      "openFileInNewTab": {
-        "enabled": false,
-        "direction": "vertical",
-        "focus": true
-      },
-      "openFile": true,
-      "openFileInMode": "default",
-      "fileExistsMode": "Increment the file name",
-      "setFileExistsBehavior": false
-    }
-  ],
+  "choices": [],
   "macros": [],
   "inputPrompt": "single-line",
   "devMode": false,

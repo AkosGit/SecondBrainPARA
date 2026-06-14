@@ -1,0 +1,7 @@
+{
+  "settings": {
+    "convertHighlightsToClozes": false,
+    "convertBoldTextToClozes": false,
+    "convertCurlyBracketsToClozes": true
+  }
+}

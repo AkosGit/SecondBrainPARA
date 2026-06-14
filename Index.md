@@ -68,6 +68,37 @@ TABLE Project, Area
 FROM "ARCHIVE"
 ```
 
+## Reading queue
+```dataview
+TABLE WITHOUT ID
+  file.link AS "Source",
+  reading_status AS "Status",
+  source AS "URL",
+  (date(today) - file.ctime).days + " d" AS "Age"
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status AND reading_status = "inbox"
+SORT file.ctime ASC
+```
+
+## Inbox count
+```dataview
+TABLE WITHOUT ID length(rows.file.link) AS "Items waiting to be read"
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status AND reading_status = "inbox"
+GROUP BY true
+```
+
+## Digestion funnel
+```dataview
+TABLE WITHOUT ID
+  key AS "Stage",
+  length(rows.file.link) AS "Count"
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status
+GROUP BY reading_status
+SORT length(rows.file.link) DESC
+```
+
 ## Files without parent links
 ```dataview
 table file.name as "Note Name"
