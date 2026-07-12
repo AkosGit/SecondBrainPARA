@@ -1,10 +1,8 @@
 ---
-Parent: "[[PROJECTS/Daily notes/00000|Link]]"
-Type: ProjectFile
-Area: Health
-Category: Daily note
-Subcategory: health
-Project: Daily Notes
+Parent: "[[Index|Link]]"
+Type: Daily
+tags:
+  - area/health
 ---
 # Daily note <% tp.date.now("YYYY-MM-DD") %>
 ## Feelings

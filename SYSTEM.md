@@ -1,53 +1,73 @@
 ---
 Parent: "[[Index|Link]]"
 Type: Documentation
-Area: Meta
+tags:
+  - area/meta
 ---
-# SecondBrainPARA — Technical System Reference
+# SecondBrainPARA — Technical System Reference (v2)
 
-Strictly technical description of the vault's architecture, metadata contract, template logic, query layer, plugin stack, configuration, and supported workflows. The vault implements the **PARA** method (Projects, Areas, Resources, Archive) over plain Markdown, with all dynamic behaviour pushed into frontmatter conventions and plugin queries. The four top-level PARA folders are *structural scaffolding only* — they contain no logic. All intelligence lives in `Index.md`, `Boards.md`, the seven files under `Templates/`, and the plugin configuration under `.obsidian/`.
+Technical description of the vault's architecture after the v2 metadata migration (2026-07-12). The vault still follows **PARA** (Projects, Areas, Resources, Archive) over plain Markdown, but classification moved from scalar frontmatter fields (`Area` / `Category` / `Subcategory`) to **namespaced tags**. Folders are structural scaffolding only; all intelligence lives in `Index.md`, `Boards.md`, the templates under `Templates/`, and the plugin configuration under `.obsidian/`.
+
+A pre-migration snapshot of every note and template was saved outside the vault before the rewrite.
 
 ---
 
-## 1. Plugin stack
+## 0. How it works — quick tour
 
-### 1.1 Load-bearing plugins
+**One idea: everything is a tagged note.** There are no category folders and no `Area`/`Category`/`Subcategory` fields anymore. Every note carries frontmatter `tags`, and two tag namespaces do all the classification work: `area/…` says *which part of your life this belongs to* (exactly one per note — e.g. `area/health`), and `topic/…` says *what it's about* (as many as you like, nested freely — e.g. `topic/programming/python`). Dashboards are just saved queries over these tags, so a note is "filed" the moment it's tagged, wherever it physically sits.
 
-The system is non-functional without these five. Each is structurally required:
+**Creating things.** You never write frontmatter by hand — templates do it. Each template prompts you with dropdowns built from the tags that already exist in the vault, so the vocabulary stays consistent:
 
-| Plugin | Role in the system | Where invoked |
+1. **New area** → new note in `AREAS/` from `AreaIndexTemplate`. One flat note per area (e.g. `AREAS/Health.md`), no folder. This hub note automatically lists every project, idea, resource, and source tagged with its area.
+2. **New project** → new folder in `PROJECTS/`, then a note from `ProjectIndexTemplate` (becomes `00000.md`). You pick the area (one) and topics (any). Its body auto-lists the project's kanban board and all project files grouped by topic.
+3. **Notes inside a project** → `ProjectFileTemplate`. You pick what it is (Resource / Idea / Source); it inherits the project's tags so it shows up everywhere the project does.
+4. **Standalone notes** → `ResourceTemplate` (reference material you wrote) or `IdeaTemplate` (permanent notes in your own words) — both ask for area + topics.
+5. **Captured reading** → `SourceTemplate` into `Inbox/`. Sources are deliberately untagged at capture; tags are assigned later on the Idea note you extract from them.
+
+**Tasks.** Each project gets one kanban board (`TasksTemplate`). The board is the source of truth for status — a task's state *is* the list it sits in. If a task is big enough to deserve a note, put a wikilink to that note first in the card: `Index.md` then shows the note title as the clickable task entry. Cards without links just show their text. Due dates: `@{YYYY-MM-DD}`.
+
+**The daily loop.** Open Obsidian → `Index.md` loads automatically. Top of the page: your In Progress and Backlog tasks across all projects, each a click away. Below that: projects grouped by area, your reading queue from the Inbox, and all notes grouped by topic. When a project finishes, drag its folder to `ARCHIVE/` — that's the only folder move the system ever asks of you.
+
+Everything below is the precise contract behind this tour.
+
+---
+
+## 1. Metadata contract
+
+### 1.1 Tag namespaces
+
+All classification is carried by frontmatter `tags`. Two reserved namespaces:
+
+| Namespace | Meaning | Cardinality | Example |
+|---|---|---|---|
+| `area/*` | PARA Area membership (ongoing responsibility). | **Exactly one** per project index / resource / idea. Drives grouping, hub queries, and accountability. | `area/health` |
+| `topic/*` | Subject classification. Nested freely — replaces the old fixed Category→Subcategory hierarchy. | Zero or more. | `topic/programming/python` |
+
+Anything outside these namespaces is a free ad-hoc tag with no system meaning.
+
+Conventions: tags are lowercase, slugified (`[a-z0-9-]`, nested with `/`). Templates enforce this via a shared `slugify()` helper and suggester prompts that read the *existing* tag vocabulary from the vault — controlled vocabulary without fixed fields. Dataview queries match with `contains(file.tags, "#area/x")` (`file.tags` expands nested tags, so `#topic/programming` also matches notes tagged `#topic/programming/python`; `file.etags` holds only explicit tags and is used for display).
+
+### 1.2 Type field
+
+One `Type` value per note:
+
+| Type | Meaning | Where |
 |---|---|---|
-| **Templater** (`templater-obsidian`) | Executes JS (`<%* … %>`) at file creation: renames files, prompts the user, reads sibling frontmatter, and writes frontmatter via `app.fileManager.processFrontMatter`. | All 7 templates |
-| **Dataview** | Declarative `dataview` query blocks (TABLE/LIST) that index frontmatter across the vault. | `Index.md`, `Boards.md`, Area/Project index templates |
-| **DataviewJS** | Imperative `dataviewjs` block for the grouped Category→Subcategory report (needs procedural grouping Dataview's DQL can't express). | `Index.md` |
-| **Modal Forms** (`modalforms`) | `app.plugins.plugins.modalforms.api` — renders the `master_health_log` form and serialises answers to frontmatter. Global namespace `MF`, editor opens right. | `DailyNoteTemplate.md` |
-| **Kanban** (`obsidian-kanban`) | Reads `kanban-plugin: board` frontmatter + the `%% kanban:settings %%` block to render a board view from Markdown lists. | `TasksTemplate.md`, surfaced by `Boards.md` |
+| `Index` | Hub/dashboard note: the main `Index.md`, `Boards.md`, area hubs in `AREAS/`, project `00000.md` files, `Inbox/00000.md`. Distinguished by `Parent` and location, not by extra fields. | anywhere |
+| `Resource` | Your own evergreen reference material. | `RESOURCES/` or inside a project folder |
+| `Idea` | Permanent note in your own words; carries `source-notes: []` backlinks. | anywhere |
+| `Source` | Captured external material. **Must** carry a `source:` field (URL/book/person) — that is the crisp Source-vs-Resource line. Lands in `Inbox/` with `reading_status`. | `Inbox/`, later anywhere |
+| `Tasks` | Kanban board file (`kanban-plugin: board`). | project folders |
+| `Daily` | Daily/health log notes. Outside the PARA taxonomy; fixed `area/health` tag. | daily notes |
+| `Documentation` | Meta notes about the vault itself (this file, intake plans). | root |
 
-### 1.2 Full installed inventory
+### 1.3 Other fields
 
-All 17 community plugins enabled in `.obsidian/community-plugins.json`, with their role in this vault:
-
-| Plugin | Function |
-|---|---|
-| `dataview` | Query engine (above). |
-| `templater-obsidian` | Templating engine (above). |
-| `obsidian-kanban` | Kanban boards (above). |
-| `modalforms` | Structured input forms (above). |
-| `homepage` | Opens `Index.md` on startup as the vault home (configured "Main Homepage", `openOnStartup: true`, replace-all-panes). Makes the Index the default landing dashboard. |
-| `periodic-notes` | Daily/periodic note scheduling; pairs with `DailyNoteTemplate.md` to create dated health-log notes. |
-| `quickadd` | Capture/macro launcher for fast note creation. AI assistant present but `disableOnlineFeatures: true`. |
-| `obsidian-git` | Commits the vault to Git for backup/version history (`commitMessage: "vault backup: {{date}}"`, `syncMethod: merge`). One of the sources of `.sync-conflict` artefacts. |
-| `system3-relay` | Real-time multi-device collaboration/sync layer — the primary generator of the `.sync-conflict-*` files seen across `.obsidian/` and surfaced by the Index audit. |
-| `obsidian-outliner` | Structured list/outline editing (bullet manipulation, fold). |
-| `obsidian-linter` | Markdown/YAML normalisation on save; in this vault most YAML-mutating rules are disabled to avoid clobbering template-written frontmatter. |
-| `various-complements` | Word/phrase autocompletion while typing. |
-| `find-unlinked-files` | Detects orphan / unlinked / broken-link files; its command generates `orphaned files output.md` (see §5.2). Complements — but differs from — the Index's frontmatter-based "Files without parent links" query. |
-| `obsidian-spaced-repetition` | Flashcard review / SRS over note content. |
-| `obsidian-paste-image-rename` | Auto-renames pasted images on paste for consistent attachments. |
-| `better-export-pdf` | Bulk/configurable PDF export of notes. |
-| `pdf-plus` | Enhanced PDF viewing & annotation/back-linking. |
-
-Core plugins enabled include `daily-notes`, `templates` (folder set to `Templates`), `graph`, `backlink`, `outgoing-link`, `bookmarks`, `file-recovery`, and `bases`. The legacy core `sync` is **off** — syncing is handled by `system3-relay` and `obsidian-git` instead.
+- `Parent` — upward link for hierarchy audit. Project files → project `00000`; project indexes / resources / ideas → their **area hub note**; hubs → `[[Index]]`.
+- `Project` — folder name, stamped on project indexes, project files, and boards.
+- `source`, `reading_status`, `ideas-extracted` — Source-note intake fields (unchanged from the v1 intake plan).
+- `status` — Idea-note maturity: `seed` → `developing` → `evergreen`. Stamped `seed` at creation; you promote it by hand as the note matures. The Index surfaces every `seed`/`developing` idea until promoted.
+- **Removed fields:** `Area`, `Category`, `Subcategory`. Do not reintroduce them; every query now reads tags.
 
 ---
 
@@ -55,193 +75,78 @@ Core plugins enabled include `daily-notes`, `templates` (folder set to `Template
 
 ```
 SecondBrainPARA/
-├── Index.md            ← global dashboard (Dataview hub, opens on startup via Homepage)
-├── Boards.md           ← cross-project task dashboard (flattens all Kanban boards)
-├── orphaned files output.md  ← generated report of unlinked files (find-unlinked-files)
-├── AREAS/              ← long-running responsibilities (one subfolder per Area)
-├── PROJECTS/           ← active, outcome-bound efforts (one subfolder per Project)
-├── RESOURCES/          ← topic reference material
-├── ARCHIVE/            ← completed / inactive projects
-├── Templates/          ← Templater source templates (7)
-└── .obsidian/          ← vault configuration: plugins, settings, themes, sync state
+├── Index.md              ← global dashboard (opens on startup via Homepage)
+├── Boards.md             ← list of kanban boards (task tables moved to Index)
+├── SYSTEM.md             ← this file
+├── Inbox/                ← flat staging lane for Type: Source captures
+│   └── 00000.md          ← inbox hub (Type: Index)
+├── AREAS/                ← FLAT area hub notes: AREAS/Health.md, AREAS/Work.md …
+├── PROJECTS/<Name>/      ← one folder per project
+│   ├── 00000.md          ← project index (Type: Index, tags: [area/x, topic/…])
+│   ├── <Name> Tasks.md   ← kanban board (Type: Tasks)
+│   └── *.md              ← project files (Type: Resource | Idea | Source)
+├── RESOURCES/            ← standalone reference notes (tag-classified, flat)
+├── ARCHIVE/              ← completed project folders, moved here wholesale
+└── Templates/
 ```
 
-PARA semantics as implemented here:
-
-- **Area** — a sphere of ongoing responsibility (e.g. `Health`). An Area folder is identified by its `00000.md` index file with `Type: Area`. Projects and Resources link *up* to an Area.
-- **Project** — a folder under `PROJECTS/` whose `00000.md` carries `Type: Project`. Holds many *ProjectFiles*. Linked up to one Area.
-- **Resource** — reference note under `RESOURCES/`, `Type: Resource`, classified by `Area` + `Category` + `Subcategory`.
-- **Archive** — structurally identical to Projects; the move to `ARCHIVE/` is the only thing that marks a project inactive. Queries discriminate purely on folder (`FROM "ARCHIVE"`).
-
-### The `00000.md` convention
-
-Every Area, Project, and Archived Project folder contains exactly one file named **`00000`**. This is the folder's **index/anchor note**. Three mechanisms depend on it:
-
-1. **Discovery** — Dataview queries use `WHERE file.name = "00000"` to list "one row per Area/Project" instead of one row per note.
-2. **Parent resolution** — child templates build their `Parent` wikilink by pointing at `<folder>/00000` (e.g. `[[PROJECTS/MyProject/00000|Link]]`).
-3. **Metadata inheritance** — `ProjectFile`, `Resource`, and `Tasks` templates *read* `Area`/`Category` out of the sibling `00000.md` frontmatter via `app.metadataCache.getFileCache(file)?.frontmatter`, so child notes inherit their parent's classification without re-prompting.
-
-Templates that produce an index note force the title to `00000` (Area, Project, Archive). Templates that produce leaf notes prompt for a real title (Idea, Resource, ProjectFile) or derive one (`<folder> Tasks`).
+Key change from v1: **AREAS/ contains flat hub notes, not folders.** An area exists iff a hub note exists. Area membership is a tag; the hub note is a saved set of Dataview queries over that tag (projects, ideas, resources, sources). Archiving is still folder-based: move the project folder to `ARCHIVE/` — the one place a folder carries meaning.
 
 ---
 
-## 3. Frontmatter contract (metadata schema)
+## 3. Templates
 
-The query layer is only as good as the frontmatter every note carries. Canonical keys:
+All templates keep the v1 idiom: prompt → rename → write frontmatter via `processFrontMatter`. Shared helpers (inlined per template): `slugify()`, `allFrontmatterTags(prefix)` (scans vault for existing `area/*` / `topic/*` vocabulary), `pickAreaHub()` (suggester over flat notes in `AREAS/`, with "new area" fallback), `pickTopicTags()` (multi-select loop with "New topic…" / "Done").
 
-| Key | Type | Set by | Meaning |
-|---|---|---|---|
-| `Parent` | wikilink `[[…/00000\|Link]]` | all templates | Upward link to the containing index note. Powers the "Files without parent links" integrity check. |
-| `Type` | enum | all templates | One of `Area`, `Project`, `ProjectFile`, `Resource`, `Idea`, `Tasks`. The system's primary discriminator. |
-| `Area` | string | all templates | Owning Area. On Areas it is the folder name; elsewhere inherited from the parent `00000`. |
-| `Project` | string | Project/ProjectFile/Tasks | Owning project (= folder name). |
-| `Category` | string | Project/ProjectFile/Resource | Top-level classification (free-text, chosen from existing values or "Other…"). |
-| `Subcategory` | string | ProjectFile/Resource | Second-level classification, drives the Index Category report. |
-| `tags` | list | Project/Idea/Resource | Initialised empty `[]` for later tagging. |
-| `kanban-plugin` | `"board"` | Tasks | Signals the Kanban plugin to render the file as a board. |
-
-`Category` and `Subcategory` are **vault-global free vocabularies**: templates harvest the *distinct existing values* across all files (`app.vault.getFiles()` → collect `frontmatter.Category`/`.Subcategory` into a `Set`) and present them in a `tp.system.suggester` dropdown with an "Other…" escape hatch that prompts for a new value. This produces a self-reinforcing, drift-resistant taxonomy without a central schema file.
-
----
-
-## 4. Templates — behavioural reference
-
-All templates are Templater scripts. Common idioms:
-- **Title handling**: if `tp.file.title` starts with `"Untitled"`, either set it to `"00000"` (index notes) or `await tp.system.prompt("Title")` (leaf notes), then `await tp.file.rename(title)`.
-- **Deferred frontmatter write**: leaf/index writes are wrapped in `setTimeout(… , 200)` to let Obsidian finish creating the file before `processFrontMatter` mutates it (a race-condition workaround).
-- **Folder = identity**: `tp.file.folder()` is used as the Project/Area name throughout, so *moving/creating a note in the right folder* is what assigns its classification.
-
-### 4.1 AreaIndexTemplate
-Produces an Area's `00000`. Forces title to `00000`, sets `Parent=[[Index|Link]]`, `Type=Area`, `Area=<folder name>`. Body renders three Dataview blocks scoped to this Area: child **Projects** (`FROM "PROJECTS" WHERE file.name="00000" AND Area=<folder>`), **Ideas** (notes in this folder with `Type=Idea`), and **Resources** (`FROM "RESOURCES" WHERE Area=<folder>`). Net effect: each Area note is a live mini-dashboard of everything attached to that responsibility.
-
-### 4.2 ProjectIndexTemplate
-Produces a Project's `00000`. Prompts the user to pick the owning **Area** (suggester over distinct `Area` values found under `AREAS/`) and a **Category** (global vocabulary + "Other…"). Writes `Parent=[[AREAS/<area>/00000|Link]]`, `Type=Project`, `Area`, `Category`, `Project=<folder>`, `tags=[]`. Body lists all non-`00000` notes in the project folder (`LIST WHERE contains(file.folder, this.file.folder) AND file.name != "00000"`).
-
-### 4.3 ProjectFileTemplate
-A leaf note inside a project. Prompts for a title, then **inherits** `Area` and `Category` by reading the sibling `<folder>/00000.md` frontmatter (no re-prompt), and prompts only for `Subcategory` (global vocabulary + "Other…"). Writes `Parent=[[PROJECTS/<folder>/00000|Link]]`, `Type=ProjectFile`, inherited `Area`/`Category`, chosen `Subcategory`, `Project=<folder>`.
-
-### 4.4 TasksTemplate
-Creates the project's Kanban board. Title auto-derived as `"<folder> Tasks"`. Inherits `Area` from the project `00000`. Sets `Parent`, `Type=Tasks`, `Project`, and crucially `kanban-plugin: board`. Body seeds three lists — **Backlog / In Progress / Done** — plus the `%% kanban:settings %%` block (`list-collapse`, `show-checkboxes:false`). The Kanban plugin then renders this file as a draggable board; the underlying storage remains plain Markdown lists.
-
-### 4.5 IdeaTemplate
-Lightweight capture note that lives inside an **Area** folder. Prompts for a title; sets `Parent=[[AREAS/<folder>/00000|Link]]`, `Type=Idea`, `Area=<folder>`, `tags=[]`. Surfaced by the Area index's Ideas query.
-
-### 4.6 ResourceTemplate
-Reference note under `RESOURCES/`. Prompts for title, then picks **Area** (suggester over `AREAS/`), **Category** (global), and **Subcategory** (global). Writes `Parent=[[AREAS/<area>/00000|Link]]`, `Type=Resource`, `Area`, `Category`, `Subcategory`, `tags=[]`.
-
-### 4.7 DailyNoteTemplate
-The only **static-frontmatter** template (keys written literally, not via JS): `Type=ProjectFile`, `Area=Health`, `Category=Daily note`, `Subcategory=health`, `Project=Daily Notes`, parented to `PROJECTS/Daily notes/00000`. On creation it opens the **`master_health_log` Modal Form** via the Modal Forms API and appends the result as a frontmatter string (`result.asFrontmatterString()`) under a `## Feelings` heading, followed by a free-text `## Notes` section. This makes daily notes a structured health-logging instrument whose form fields become queryable frontmatter.
-
----
-
-## 5. Query layer — `Index.md` dashboard
-
-`Index.md` is the vault's control panel. It composes the metadata contract into nine live views:
-
-1. **Boards** — a wikilink hub (`[[Boards]]`) that resolves to `Boards.md` (see §5.1), the cross-project task dashboard.
-2. **Areas** — `TABLE … FROM "AREAS" WHERE file.name = "00000"` → one row per Area.
-3. **Projects** — `FROM "PROJECTS" WHERE file.name = "00000"`, showing Project + Area → active projects.
-4. **Resources** — `TABLE Area FROM "RESOURCES"` → all reference notes by Area.
-5. **Archived projects** — same shape as Projects but `FROM "ARCHIVE" WHERE file.name="00000"`.
-6. **Categories and subcategories** — a **DataviewJS** block: runs a DQL query grouped by `Category`, `FLATTEN rows as R`, then in JS builds a dictionary keyed by Category and emits one sub-table (Note link + Subcategory) per Category. Procedural because DQL alone can't render "a separate table per group."
-7. **Inactive projects** — `TABLE Project, Area FROM "ARCHIVE"` (all archive notes, not just indexes).
-8. **Files without parent links** — integrity audit: `FROM "" WHERE !Parent AND !contains(file.name,"Template") AND file.name != "Index"`. Flags orphan notes that escaped the template pipeline.
-9. **Sync conflicted files** — operational hygiene: `WHERE contains(file.name, ".sync-conflict")` surfaces Obsidian Sync / file-sync collision artefacts for cleanup.
-
-Queries 8 and 9 are the system's **self-maintenance layer**: they make schema violations and sync damage visible on the home screen rather than letting them rot silently. (Note: the sync-conflict audit only catches Markdown conflicts; `.sync-conflict` artefacts inside `.obsidian/` are JSON and are not indexed by Dataview — clean those manually.)
-
-### 5.1 `Boards.md` — cross-project task dashboard
-
-`Boards.md` is the target of the Index's `[[Boards]]` link and is the operational view *across all Kanban boards at once*. It contains three Dataview blocks:
-
-1. **In progress tasks** — `FROM "" FLATTEN file.tasks AS Tasks WHERE contains(meta(Tasks.section).subpath, "In Progress")`. Aggregates every checklist item that sits under an `In Progress` heading in *any* file, regardless of which board it lives on.
-2. **Kanban boards** — `FROM "PROJECTS" WHERE contains(file.name, " Tasks")`. Lists every task board (board files are named `<Project> Tasks` by TasksTemplate), giving a project-level index of boards.
-3. **Backlog tasks** — identical to #1 but filtered on the `Backlog` section.
-
-The task rows are parsed, not stored structured. Each block:
-- `split(Tasks.text, "@{")[0]` → the task label (text before the due-date token).
-- `regexreplace(Tasks.text, "[^0-9-]", "")` → the **due date**, extracted by stripping everything but digits and hyphens.
-- `meta(Tasks.section).subpath` → the **status** (the Kanban column heading the task lives under).
-- `file.link` → the originating **board**.
-
-This establishes a **task-syntax convention**: inside a board, a task is written as a Markdown checklist item carrying a `@{YYYY-MM-DD}` due-date token (e.g. `- [ ] Draft proposal @{2026-06-20}`). The Kanban plugin treats the columns (`Backlog`/`In Progress`/`Done`) as section headings, and `Boards.md` mines those sections vault-wide. Net effect: Kanban gives the per-project board UI; `Boards.md` gives the portfolio-wide "what's in progress / what's queued, and when is it due" rollup — without any extra metadata beyond the inline `@{date}` token.
-
-### 5.2 `orphaned files output.md` — unlinked-files report
-
-A **generated** (not authored) report produced by the `find-unlinked-files` plugin on demand: running its "Create list of unlinked files" command writes the vault's orphans to this default-named note as a list of wikilinks (current contents include `[[ARCHIVE/PriceChecker/Datasets]]`; the trailing `jjjjjj` is stray text). It is a static snapshot — it does not refresh itself and must be regenerated by re-running the command.
-
-Crucially this captures a **different notion of "orphan"** than the Index's "Files without parent links" query, and the two are complementary:
-
-| View | Mechanism | "Orphan" means |
+| Template | Creates | Behaviour |
 |---|---|---|
-| Index → *Files without parent links* | Dataview, live | a note missing the `Parent` frontmatter key (a **schema/PARA** orphan that escaped the template pipeline) |
-| `orphaned files output.md` | `find-unlinked-files`, generated snapshot | a file not referenced by any wikilink anywhere (a **link-graph** orphan) |
-
-A note can be one, both, or neither: a properly templated note has a `Parent` link (passes the Index check) yet may still be unlinked *to* by anything else (appears here). Together they cover both halves of the connectivity audit.
+| `AreaIndexTemplate` | Area **hub** note, flat in `AREAS/` | Prompts area name → tag `area/<slug>`; body queries projects/ideas/resources/sources by that tag. |
+| `ProjectIndexTemplate` | `00000.md` in a project folder | Pick one area hub (Parent + `area/*` tag) + optional topics; body lists the board, groups project files by `topic/*` (dataviewjs), plus a flat table. |
+| `ProjectFileTemplate` | Note inside a project folder | Prompts `Type` (Resource/Idea/Source), **inherits** the project index's tags, optionally adds topics; Parent → project `00000`. |
+| `ResourceTemplate` | Note in `RESOURCES/` | Pick area hub + topics; `Type: Resource`; Parent → hub. |
+| `IdeaTemplate` | Permanent note | Pick area hub + topics + maturity (`status: seed` default); adds `source-notes: []`; Parent → hub. Body ends with a live **Related notes** footer (dataviewjs: every note sharing a `topic/*` tag). |
+| `SourceTemplate` | Capture in `Inbox/` | Unchanged from v1 intake plan (`Type: Source`, `reading_status: inbox`, `source:` URL, digest checklist). Tags deferred to the Idea note. |
+| `TasksTemplate` | Kanban board in a project folder | Inherits the project's `area/*` tag from `00000.md`; `Type: Tasks`, `kanban-plugin: board`, Backlog / In Progress / Done lists. |
+| `DailyNoteTemplate` | Daily health log | `Type: Daily`, `tags: [area/health]`; Modal Forms `master_health_log` unchanged. |
 
 ---
 
-## 6. Data model (relationships)
+## 4. Task convention
 
-```
-Index ──[[Boards]]──> Boards.md ──(Dataview flatten of file.tasks across vault)
-  │
-  └──< Area(00000) ──< Project(00000) ──< ProjectFile
-                │                  └─────────< Tasks (Kanban board) ──> tasks w/ @{date}
-                ├──< Idea
-                └──< Resource (also FROM RESOURCES/, keyed by Area)
+Kanban cards remain the **source of truth for status** (which list the card sits in). Convention, not requirement:
 
-ARCHIVE/Project(00000) ── structurally identical to PROJECTS; inactive by location
-```
+- If a card contains a wikilink, the **first link** is the note that *represents* that task; the Index renders it as the clickable task title.
+- Cards without links fall back to the card text as title.
+- Due dates use the Kanban plugin's `@{YYYY-MM-DD}` syntax, parsed by regex in the Index queries.
 
-- Containment is **physical** (folder) and **logical** (`Parent` wikilink + `Area`/`Project` strings) simultaneously; queries exploit whichever is cheaper.
-- Classification is **two-axis**: PARA *location* (Project vs Area vs Resource vs Archive) is orthogonal to topical *taxonomy* (`Category` → `Subcategory`). A note has both at once.
-- Inheritance flows **downward** from `00000` index notes to leaf notes at creation time and is then *frozen* into the leaf's frontmatter (denormalised), so later moving the parent does not retroactively update children.
+`Index.md` renders per-list tables (In Progress, Backlog) by flattening `file.tasks` across `PROJECTS/` and reading `meta(Tasks.section).subpath`; the title column is `choice(length(Tasks.outlinks) > 0, Tasks.outlinks[0], split(Tasks.text, " @")[0])`. `Boards.md` only lists the boards themselves.
+
+---
+
+## 5. Index.md layout
+
+Top-to-bottom: **Tasks** (In Progress, Backlog) → **Projects by area** (dataviewjs grouped on the `area/*` namespace; untagged projects fall into `unsorted`) → **Areas** (hub notes) → **Reading queue** (WIP counter that flips to a warning above 10 undigested sources; inbox/reading with age; **stale list** for sources older than 14 days, oldest first; integrated) → **Ideas** (seeds/developing needing work, plus a serendipity block that surfaces 3 random Idea notes on every open) → **Notes by topic** (dataviewjs grouped on `topic/*`; replaces the old Category→Subcategory report; multi-topic notes appear once per topic by design) → **Resources** → **Archived projects** → **Audit** (notes without `Parent`, project indexes missing an `area/*` tag).
+
+---
+
+## 6. Plugin stack
+
+Unchanged from v1 — see `.obsidian/community-plugins.json`. Load-bearing: **Templater** (template JS), **Dataview/DataviewJS** (all dashboards), **Kanban** (boards), **Modal Forms** (health log), **Homepage** (opens `Index.md` on startup). Supporting: periodic-notes, quickadd, obsidian-git, system3-relay, linter, outliner, various-complements, find-unlinked-files, spaced-repetition, paste-image-rename, better-export-pdf, pdf-plus.
 
 ---
 
 ## 7. Workflows
 
-**Stand up a new Area.** Create a subfolder under `AREAS/` → create a note (Templater fires AreaIndexTemplate) → it becomes `00000` with `Type=Area`. The Area note immediately shows empty Projects/Ideas/Resources tables that fill as you attach items.
+- **New area:** create note in `AREAS/` from `AreaIndexTemplate`. That's the whole operation — no folder.
+- **New project:** create folder in `PROJECTS/`, add `00000.md` from `ProjectIndexTemplate`, optionally a board from `TasksTemplate`.
+- **Capture (in-vault):** press `Cmd/Ctrl+Shift+S` — the QuickAdd "New Source" command creates a stamped Source note in `Inbox/` and prompts for title + URL. The Web Clipper covers capture from the browser.
+- **Capture → integrate (intake v1, unchanged):** clip/capture → `Inbox/` `Type: Source` → read & highlight → write `Type: Idea` note(s) in your own words (tags assigned here), backlink both ways, flip `reading_status: integrated`.
+- **New task with a note:** add a card to the project board; if the task deserves a note, create the note (any type) and put its wikilink first in the card.
+- **Develop ideas:** new Idea notes start as `status: seed` and sit in the Index's "Seeds needing development" table until promoted to `developing`, then `evergreen` (edit the field by hand). The related-notes footer on each Idea note and the serendipity block on the Index exist to trigger collisions between ideas.
+- **Promote a topic to a hub (rule of thumb, not machinery):** when a `topic/*` tag accumulates ~10+ notes, create a hub note for it — same pattern as an area hub, with queries filtered on that topic tag. Maps of Content emerge from evidence; don't create them upfront.
+- **Inbox discipline:** the reading queue shows a hard number against a cap of 10. If the warning is showing, digest or delete before capturing more. Anything older than 14 days appears in the stale list — integrate it or admit you never will and delete it.
+- **Archive a project:** move the folder to `ARCHIVE/`. Tags travel with the files; the Index picks it up automatically.
 
-**Start a project.** Create a folder under `PROJECTS/` → new note → ProjectIndexTemplate prompts for Area + Category → `00000` created and linked up to the Area. The Area's dashboard and the Index "Projects" table now list it automatically.
+## 8. Migration notes (v1 → v2, 2026-07-12)
 
-**Add work to a project.** Inside the project folder, create notes → ProjectFileTemplate inherits Area/Category from `00000`, prompts only for Subcategory. The project `00000` lists them via its child-files query.
-
-**Track project tasks.** Create the Tasks note (TasksTemplate) → a Kanban board with Backlog/In Progress/Done. Add cards as checklist items with an optional `@{YYYY-MM-DD}` due-date token; drag between columns. Data persists as Markdown lists. Open `Boards.md` (via `[[Boards]]` on the Index) to see, across *every* project, all In Progress and Backlog tasks with parsed due dates and their source board — a portfolio-wide task view that needs no extra metadata.
-
-**Capture an idea.** In an Area folder, new note → IdeaTemplate → tagged `Type=Idea`, surfaced under that Area's Ideas list.
-
-**File a resource.** Under `RESOURCES/`, new note → ResourceTemplate → choose Area + Category + Subcategory. Appears in the Area's Resources list, the Index Resources table, and the Category/Subcategory report.
-
-**Daily health logging.** Create today's daily note → DailyNoteTemplate opens the `master_health_log` Modal Form → answers stored as frontmatter under `## Feelings`, free notes under `## Notes`. Because the answers are frontmatter, they are queryable/aggregatable across days.
-
-**Archive a project.** Move the project folder from `PROJECTS/` to `ARCHIVE/`. No metadata edit needed — the Index's "Archived/Inactive projects" queries pick it up by folder and it drops out of the active Projects table.
-
-**Routine maintenance.** Two complementary orphan audits plus a sync check: (1) the Index's **Files without parent links** live query flags notes missing a `Parent` (re-apply the right template or add the key); (2) run `find-unlinked-files` to regenerate **`orphaned files output.md`**, listing files nothing links to (link-graph orphans) — then either link them in or delete; (3) the Index's **Sync conflicted files** section surfaces `.sync-conflict` duplicates to resolve. Together these keep both the metadata graph and the link graph clean.
-
----
-
-## 8. Vault configuration (`.obsidian/`)
-
-The configuration directory pins the runtime behaviour the templates and queries assume:
-
-- **Startup / homepage** — `homepage` plugin is set to open `Index.md` on launch ("Main Homepage", replace all panes), so the Dataview dashboard is the landing screen.
-- **Templater** (`plugins/templater-obsidian/data.json`) — `templates_folder: "Templates"`, `trigger_on_file_creation: true` (templates fire automatically on new-file creation, enabling the `00000` auto-index pattern), `enable_system_commands: true`, `enable_folder_templates: true`, `command_timeout: 5`, `auto_jump_to_cursor: true`. The folder-template list is currently a single empty pair, i.e. folder→template mapping is not pre-wired, so template selection is effectively manual/per-creation.
-- **Core Templates** (`templates.json`) — folder also set to `Templates`.
-- **Modal Forms** — global namespace `MF`, editor position right. The `master_health_log` form referenced by DailyNoteTemplate must exist in this plugin's `formDefinitions` for daily notes to work (the shipped config also contains an `example-form`).
-- **Linter** (`obsidian-linter`) — YAML-mutating rules (`format-yaml-array`, `insert-yaml-attributes`, `sort-yaml-array-values`, etc.) are **disabled**, deliberately preventing the linter from rewriting the frontmatter that templates author.
-- **PDF export** (`app.json`) — Letter, portrait, zero margin, 100% scale, includes note name; consumed by `better-export-pdf` / `pdf-plus`.
-- **Linking** — `alwaysUpdateLinks: true`, so renaming/moving notes rewrites wikilinks automatically (important given the `Parent`/`00000` link graph).
-- **Sync & versioning** — handled by `system3-relay` (real-time multi-device) and `obsidian-git` (commit-based backup); core `sync` is off. The numerous `*.sync-conflict-*.json` files under `.obsidian/` are collision artefacts from concurrent multi-device edits to settings — harmless to delete, and a signal of how actively the vault is synced across desktop and mobile (`workspace-mobile.json` confirms mobile use).
-
----
-
-## 9. Design properties & constraints
-
-- **Convention over configuration**: behaviour is encoded in folder placement + frontmatter, not in a settings file. Put a note in the right folder and the template does the rest.
-- **Denormalised inheritance**: child classification is copied at creation, not referenced live — fast queries, but parent changes don't propagate.
-- **Free-vocabulary taxonomy** with suggester + "Other…" keeps `Category`/`Subcategory` consistent without a controlled-vocab file, at the cost of possible near-duplicates (e.g. casing) that only manual review catches.
-- **Single-anchor coupling**: everything hinges on the `00000` convention; a missing or misnamed anchor breaks Parent links and per-folder rollups.
-- **`setTimeout` race workaround** in templates is timing-dependent; on very slow vaults frontmatter writes could in principle miss.
-- **Portable core, plugin-bound dynamics**: notes are plain Markdown (portable), but every dashboard, board, form, and inheritance step requires its plugin to be present and enabled.
+The PARA folders were empty at migration time, so no note frontmatter needed conversion. Changed in one pass: all 8 templates, `Index.md`, `Boards.md`, `Inbox/00000.md`, this file. The v1 `Area`/`Category`/`Subcategory` contract, the AREAS folder-per-area layout, and the old grouped Category report are retired. The intake-plan documents (`Information Intake — v1 *`) still describe the old `Area` fields in places; their Source/Idea pipeline is untouched and remains valid.

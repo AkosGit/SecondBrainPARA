@@ -1,99 +1,68 @@
-<%* 
+<%*
 let title = tp.file.title;
-
-if (title.startsWith("Untitled")) { 
-  title = await tp.system.prompt("Title"); 
-} 
+if (title.startsWith("Untitled")) {
+  title = await tp.system.prompt("Title");
+}
 await tp.file.rename(title);
-  
-async function getArea(folderPath) {
-  // Get all files in the specified folder
-  const files = app.vault.getFiles().filter(file => file.path.startsWith(folderPath + "/"));
 
-  // Extract unique values for the `Area` property in frontmatter
-  const areaValues = new Set();
-  for (const file of files) {
-    const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-    if (metadata && metadata.Area) {
-      areaValues.add(metadata.Area);
+// ---- helpers ----
+function slugify(s) {
+  return s.trim().toLowerCase().replace(/[^a-z0-9/]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function allFrontmatterTags(prefix) {
+  const out = new Set();
+  for (const f of app.vault.getMarkdownFiles()) {
+    const tags = app.metadataCache.getFileCache(f)?.frontmatter?.tags;
+    if (Array.isArray(tags)) {
+      for (const t of tags) if (String(t).startsWith(prefix)) out.add(String(t));
     }
   }
-
-  // Convert the Set to an array and sort it
-  const options = Array.from(areaValues).sort();
-
-  // Prompt the user with a dropdown menu
-  const selection = await tp.system.suggester(options, options);
-  return selection;
+  return Array.from(out).sort();
 }
 
-async function getCategoryOptions() {
-  // Get all files in the specified folder
-  const files = app.vault.getFiles()
+async function pickAreaHub() {
+  const hubs = app.vault.getMarkdownFiles()
+    .filter(f => f.path.startsWith("AREAS/") && !f.path.slice("AREAS/".length).includes("/"));
+  const labels = hubs.map(h => h.basename);
+  labels.push("Other (new area)...");
+  const values = [...hubs, null];
+  const pick = await tp.system.suggester(labels, values, false, "Area (exactly one)");
+  if (pick === null) {
+    const name = await tp.system.prompt("New area name (remember to create its hub note in AREAS/):");
+    return { hubName: name, tag: "area/" + slugify(name) };
+  }
+  const fm = app.metadataCache.getFileCache(pick)?.frontmatter;
+  const tag = (fm?.tags ?? []).map(String).find(t => t.startsWith("area/")) ?? ("area/" + slugify(pick.basename));
+  return { hubName: pick.basename, tag: tag };
+}
 
-  // Extract unique values for the `Area` property in frontmatter
-  const categorys = new Set();
-  for (const file of files) {
-    const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-    if (metadata && metadata.Category) {
-      categorys.add(metadata.Category);
+async function pickTopicTags() {
+  const chosen = [];
+  while (true) {
+    const existing = allFrontmatterTags("topic/").filter(t => !chosen.includes(t));
+    const labels = [...existing, "New topic...", "Done (" + chosen.length + " selected)"];
+    const values = [...existing, "__new__", "__done__"];
+    const pick = await tp.system.suggester(labels, values, false, "Topic tags (optional)");
+    if (pick === "__done__" || pick === null) break;
+    if (pick === "__new__") {
+      const raw = await tp.system.prompt("New topic (nest with '/', e.g. programming/python):");
+      if (raw) chosen.push("topic/" + slugify(raw));
+    } else {
+      chosen.push(pick);
     }
   }
-
-  // Convert the Set to an array and sort it
- let options = Array.from(categorys).sort();
- options.push("Other...")
- 
-
-  // Prompt the user with a dropdown menu
-  const selection = await tp.system.suggester(options, options);
-  let finalanswer = selection
-  if(selection == "Other..."){
-	finalanswer = await tp.system.prompt("New category:");
-  }
-  return finalanswer;
+  return chosen;
 }
+// -----------------
 
-async function getSubCategoryOptions() {
-  // Get all files in the specified folder
-  const files = app.vault.getFiles()
+const area = await pickAreaHub();
+const topics = await pickTopicTags();
 
-  // Extract unique values for the `Area` property in frontmatter
-  const subcategorys = new Set();
-  for (const file of files) {
-    const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-    if (metadata && metadata.Subcategory) {
-      subcategorys.add(metadata.Subcategory);
-    }
-  }
-
-  // Convert the Set to an array and sort it
- let options = Array.from(subcategorys);
- options.push("Other...")
- 
-
-  // Prompt the user with a dropdown menu
-  const selection = await tp.system.suggester(options, options);
-  let finalanswer = selection
-  if(selection == "Other..."){
-	finalanswer = await tp.system.prompt("New subcategory:");
-  }
-  return finalanswer;
-}
-
-async function updateFrontmatter() {
-  const areaSelection = await getArea("AREAS");
-  const categorySelection = await getCategoryOptions()
-  const subcategorySelection = await getSubCategoryOptions()
-  await app.fileManager.processFrontMatter(tp.config.target_file, frontmatter => {
-  frontmatter["Parent"] = `[[AREAS/${areaSelection}/00000|Link]]`
-  frontmatter["Type"] = "Resource"
-  frontmatter["Area"] = areaSelection
-  frontmatter["Category"] = categorySelection;
-  frontmatter["Subcategory"] = subcategorySelection;
-  frontmatter["tags"] = []
-  })
-}
-updateFrontmatter()
+await app.fileManager.processFrontMatter(tp.config.target_file, fm => {
+  fm["Parent"] = `[[AREAS/${area.hubName}|Link]]`;
+  fm["Type"] = "Resource";
+  fm["tags"] = [area.tag, ...topics];
+});
 -%>
 # <% title %>

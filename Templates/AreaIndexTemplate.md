@@ -1,40 +1,45 @@
-<%* 
-let title = tp.file.title 
-let sSubject = ""
-let sCategory = ""
+<%*
+let title = tp.file.title;
+if (title.startsWith("Untitled")) {
+  title = await tp.system.prompt("Area name");
+}
+await tp.file.rename(title);
 
-if (title.startsWith("Untitled")) { 
-  title = "00000"
-} await tp.file.rename(title);
+const slug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const areaTag = "area/" + slug;
 
-sArea = tp.file.folder()
-
-setTimeout(() => {
-  app.fileManager.processFrontMatter(tp.config.target_file, frontmatter => {
-  frontmatter["Parent"] = `[[Index|Link]]`
-  frontmatter["Type"] = "Area"
-  frontmatter["Area"] = sArea
-  })
-}, 200)
+setTimeout(async () => {
+  await app.fileManager.processFrontMatter(tp.config.target_file, fm => {
+    fm["Parent"] = "[[Index|Link]]";
+    fm["Type"] = "Index";
+    fm["tags"] = [areaTag];
+  });
+}, 200);
 -%>
-# <% sArea %>
+# <% title %>
 
 ## Projects
 ```dataview
-TABLE Project AS "Project" 
-FROM "PROJECTS" 
-WHERE file.name = "00000" AND Area = "<% tp.file.folder() %>"
+TABLE Project AS "Project", join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics"
+FROM "PROJECTS"
+WHERE file.name = "00000" AND contains(file.tags, "#<% areaTag %>")
 ```
 
 ## Ideas
 ```dataview
-LIST 
-WHERE contains(file.folder, this.file.folder) AND Type = "Idea"
+LIST
+WHERE Type = "Idea" AND contains(file.tags, "#<% areaTag %>")
 ```
 
 ## Resources
 ```dataview
-LIST 
+LIST
 FROM "RESOURCES"
-WHERE Area = "<% tp.file.folder() %>"
+WHERE contains(file.tags, "#<% areaTag %>")
+```
+
+## Sources
+```dataview
+LIST
+WHERE Type = "Source" AND contains(file.tags, "#<% areaTag %>")
 ```

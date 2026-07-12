@@ -1,73 +1,69 @@
-<%* 
+<%*
 let title = tp.file.title;
-
-if (title.startsWith("Untitled")) { 
-  title = await tp.system.prompt("Title"); 
-} 
+if (title.startsWith("Untitled")) {
+  title = await tp.system.prompt("Title");
+}
 await tp.file.rename(title);
 
-async function getArea() {
-  // Get all files in the specified folder
-	const folder = tp.file.folder();
-	const filePath = `${folder}/00000.md`;
-	console.log(filePath)
-	const file = await tp.file.find_tfile(`${tp.file.folder()}/00000.md`);
-	const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-	return metadata.Area
+// ---- helpers ----
+function slugify(s) {
+  return s.trim().toLowerCase().replace(/[^a-z0-9/]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-async function getCategory() {
-  // Get all files in the specified folder
-	const folder = tp.file.folder();
-	const filePath = `${folder}/00000.md`;
-	const file = await tp.file.find_tfile(`${tp.file.folder()}/00000.md`);
-	const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-	return metadata.Category
-}
-
-
-async function getSubCategoryOptions() {
-  // Get all files in the specified folder
-  const files = app.vault.getFiles()
-
-  // Extract unique values for the `Area` property in frontmatter
-  const subcategorys = new Set();
-  for (const file of files) {
-    const metadata = app.metadataCache.getFileCache(file)?.frontmatter;
-    if (metadata && metadata.Subcategory) {
-      subcategorys.add(metadata.Subcategory);
+function allFrontmatterTags(prefix) {
+  const out = new Set();
+  for (const f of app.vault.getMarkdownFiles()) {
+    const tags = app.metadataCache.getFileCache(f)?.frontmatter?.tags;
+    if (Array.isArray(tags)) {
+      for (const t of tags) if (String(t).startsWith(prefix)) out.add(String(t));
     }
   }
-
-  // Convert the Set to an array and sort it
- let options = Array.from(subcategorys).sort();
- options.push("Other...")
- 
-
-  // Prompt the user with a dropdown menu
-  const selection = await tp.system.suggester(options, options);
-  let finalanswer = selection
-  if(selection == "Other..."){
-	finalanswer = await tp.system.prompt("New subcategory:");
-  }
-  return finalanswer;
+  return Array.from(out).sort();
 }
 
+async function pickTopicTags() {
+  const chosen = [];
+  while (true) {
+    const existing = allFrontmatterTags("topic/").filter(t => !chosen.includes(t));
+    const labels = [...existing, "New topic...", "Done (" + chosen.length + " selected)"];
+    const values = [...existing, "__new__", "__done__"];
+    const pick = await tp.system.suggester(labels, values, false, "Extra topic tags (optional)");
+    if (pick === "__done__" || pick === null) break;
+    if (pick === "__new__") {
+      const raw = await tp.system.prompt("New topic (nest with '/', e.g. programming/python):");
+      if (raw) chosen.push("topic/" + slugify(raw));
+    } else {
+      chosen.push(pick);
+    }
+  }
+  return chosen;
+}
+// -----------------
 
-// Ensure async behavior by awaiting the results
 setTimeout(async () => {
-  const areaSelection = await getArea()
-  const categorySelection = await getCategory();
-  const subcategorySelection = await getSubCategoryOptions();
-  app.fileManager.processFrontMatter(tp.config.target_file, frontmatter => {
-    frontmatter["Parent"] = `[[PROJECTS/${tp.file.folder()}/00000|Link]]`
-    frontmatter["Type"] = "ProjectFile";
-    frontmatter["Area"] = areaSelection;
-    frontmatter["Category"] = categorySelection
-    frontmatter["Subcategory"] = subcategorySelection
-    frontmatter["Project"] = tp.file.folder();
+  const folder = tp.file.folder();
+  const idx = await tp.file.find_tfile(`${folder}/00000.md`);
+  const idxFm = app.metadataCache.getFileCache(idx)?.frontmatter ?? {};
+  const inherited = (idxFm.tags ?? []).map(String);
+
+  const noteType = await tp.system.suggester(
+    ["Resource", "Idea", "Source"],
+    ["Resource", "Idea", "Source"],
+    false, "Note type");
+
+  const extraTopics = await pickTopicTags();
+  const tags = Array.from(new Set([...inherited, ...extraTopics]));
+
+  await app.fileManager.processFrontMatter(tp.config.target_file, fm => {
+    fm["Parent"] = `[[PROJECTS/${folder}/00000|Link]]`;
+    fm["Type"] = noteType;
+    if (noteType === "Idea") {
+      fm["status"] = "seed";
+      fm["source-notes"] = [];
+    }
+    fm["Project"] = folder;
+    fm["tags"] = tags;
   });
 }, 200);
-
 -%>
 # <% title %>

@@ -1,117 +1,164 @@
+---
+Type: Index
+---
+# Index
 
-## [[Boards]]
+## Tasks
+
+### In Progress
+```dataview
+TABLE WITHOUT ID
+  choice(length(Tasks.outlinks) > 0, Tasks.outlinks[0], split(Tasks.text, " @")[0]) AS "Task",
+  regexreplace(Tasks.text, "[^0-9-]", "") AS "Due date",
+  file.link AS "Board"
+FROM "PROJECTS"
+FLATTEN file.tasks AS Tasks
+WHERE contains(meta(Tasks.section).subpath, "In Progress")
+SORT regexreplace(Tasks.text, "[^0-9-]", "") ASC
+```
+
+### Backlog
+```dataview
+TABLE WITHOUT ID
+  choice(length(Tasks.outlinks) > 0, Tasks.outlinks[0], split(Tasks.text, " @")[0]) AS "Task",
+  regexreplace(Tasks.text, "[^0-9-]", "") AS "Due date",
+  file.link AS "Board"
+FROM "PROJECTS"
+FLATTEN file.tasks AS Tasks
+WHERE contains(meta(Tasks.section).subpath, "Backlog")
+SORT regexreplace(Tasks.text, "[^0-9-]", "") ASC
+```
+
+All boards: [[Boards]]
+
+## Projects by area
+```dataviewjs
+const projects = dv.pages('"PROJECTS"').where(p => p.file.name === "00000");
+const groups = {};
+for (const p of projects) {
+  const tags = Array.from(p.file.etags ?? []).map(String);
+  const area = tags.find(t => t.startsWith("#area/")) ?? "#area/unsorted";
+  (groups[area] ??= []).push(p);
+}
+const keys = Object.keys(groups).sort();
+if (keys.length === 0) { dv.paragraph("*No projects yet.*"); }
+for (const key of keys) {
+  dv.header(3, key.replace("#area/", ""));
+  dv.table(["Project", "Topics"], groups[key].map(p =>
+    [p.file.link, Array.from(p.file.etags ?? []).filter(t => String(t).startsWith("#topic/")).join(", ")]));
+}
+```
 
 ## Areas
 ```dataview
-TABLE Area as "Area"
-FROM "AREAS" 
-WHERE file.name = "00000"
+TABLE join(filter(file.etags, (t) => startswith(t, "#area/")), ", ") AS "Tag"
+FROM "AREAS"
+WHERE Type = "Index"
 ```
 
-## Projects
+## Reading queue
+
+```dataviewjs
+const inbox = dv.pages('"Inbox"').where(p => p.Type === "Source" && p.reading_status !== "integrated");
+const n = inbox.length;
+if (n > 10) {
+  dv.paragraph(`⚠️ **${n} sources in the inbox — digest or delete before capturing more.** (cap: 10)`);
+} else {
+  dv.paragraph(`${n} source(s) awaiting digest. (cap: 10)`);
+}
+```
+
+### Inbox / reading
 ```dataview
-TABLE Project as "Project", Area AS "Area"
-FROM "PROJECTS"
-WHERE file.name = "00000"
+TABLE WITHOUT ID file.link AS "Source", reading_status AS "Status", (date(today) - file.cday).day AS "Age (days)"
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status != "integrated"
+SORT file.ctime ASC
+```
+
+### Stale (older than 14 days)
+```dataview
+TABLE WITHOUT ID file.link AS "Source", (date(today) - file.cday).day AS "Age (days)"
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status != "integrated" AND (date(today) - file.cday).day > 14
+SORT file.ctime ASC
+```
+
+### Integrated
+```dataview
+LIST
+FROM "Inbox"
+WHERE Type = "Source" AND reading_status = "integrated"
+```
+
+## Ideas
+
+### Seeds needing development
+```dataview
+TABLE status AS "Status", join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics"
+FROM ""
+WHERE Type = "Idea" AND (status = "seed" OR status = "developing")
+SORT status ASC
+```
+
+### Serendipity — three random ideas
+```dataviewjs
+const ideas = dv.pages().where(p => p.Type === "Idea").array();
+if (ideas.length === 0) {
+  dv.paragraph("*No ideas yet.*");
+} else {
+  const pool = [...ideas];
+  const picks = [];
+  while (picks.length < 3 && pool.length > 0) {
+    picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  dv.list(picks.map(p => p.file.link));
+}
+```
+
+## Notes by topic
+```dataviewjs
+const pages = dv.pages().where(p =>
+  Array.from(p.file.etags ?? []).filter(t => String(t).startsWith("#topic/")).length > 0);
+const groups = {};
+for (const p of pages) {
+  for (const t of Array.from(p.file.etags ?? []).filter(t => String(t).startsWith("#topic/"))) {
+    (groups[t] ??= []).push(p);
+  }
+}
+const keys = Object.keys(groups).sort();
+if (keys.length === 0) { dv.paragraph("*No topic-tagged notes yet.*"); }
+for (const key of keys) {
+  dv.header(3, String(key).replace("#topic/", ""));
+  dv.table(["Note", "Type"], groups[key].map(p => [p.file.link, p.Type]));
+}
 ```
 
 ## Resources
 ```dataview
-TABLE Area 
+TABLE join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics"
 FROM "RESOURCES"
 ```
 
 ## Archived projects
 ```dataview
-TABLE Project as "Project", Area AS "Area"
+TABLE Project AS "Project", join(filter(file.etags, (t) => startswith(t, "#area/")), ", ") AS "Area"
 FROM "ARCHIVE"
 WHERE file.name = "00000"
 ```
 
-## Categories and subcategories
-```dataviewjs
+## Audit
 
-const notes = await dv.query (`
-TABLE 
-  R.file.link as Note, R.Subcategory as Subcategory
-GROUP BY
-  Category
-FLATTEN rows as R
-SORT Category, R.Subcategory
-`)
-
-console.log(notes)
-
-if (!notes.successful) {
-  dv.paragraph(`~~~~\n${ notes.error }\n~~~~\n`)
-  return
-}
-
-let typeDict = {}
-for (let note of notes.value.values) {
-  if ( !typeDict.hasOwnProperty(note[0]) )
-    typeDict[note[0]] = []
-
-  typeDict[note[0]].push([...note.slice(1)])
-}
-
-for (let key of Object.keys(typeDict)) {
-  dv.header(2, key)
-  dv.table([...notes.value.headers.slice(1)],
-    typeDict[key])
-}
+### Notes without a Parent link
+```dataview
+LIST
+FROM "PROJECTS" OR "AREAS" OR "RESOURCES" OR "Inbox"
+WHERE !Parent
 ```
 
-## Inactive projects
+### Project indexes without an area tag
 ```dataview
-TABLE Project, Area
-FROM "ARCHIVE"
-```
-
-## Reading queue
-```dataview
-TABLE WITHOUT ID
-  file.link AS "Source",
-  reading_status AS "Status",
-  source AS "URL",
-  (date(today) - file.ctime).days + " d" AS "Age"
-FROM "Inbox"
-WHERE Type = "Source" AND reading_status AND reading_status = "inbox"
-SORT file.ctime ASC
-```
-
-## Inbox count
-```dataview
-TABLE WITHOUT ID length(rows.file.link) AS "Items waiting to be read"
-FROM "Inbox"
-WHERE Type = "Source" AND reading_status AND reading_status = "inbox"
-GROUP BY true
-```
-
-## Digestion funnel
-```dataview
-TABLE WITHOUT ID
-  key AS "Stage",
-  length(rows.file.link) AS "Count"
-FROM "Inbox"
-WHERE Type = "Source" AND reading_status
-GROUP BY reading_status
-SORT length(rows.file.link) DESC
-```
-
-## Files without parent links
-```dataview
-table file.name as "Note Name"
-from ""
-where !Parent and !contains(file.name, "Template")  and file.name != "Index"
-sort file.name asc
-```
-
-
-## Sync conflicted files
-```dataview
-TABLE file.name AS "File", file.path AS "Path"
-FROM ""
-WHERE contains(file.name, ".sync-conflict")
-SORT file.name ASC
+LIST
+FROM "PROJECTS"
+WHERE file.name = "00000" AND length(filter(file.etags, (t) => startswith(t, "#area/"))) = 0
 ```
