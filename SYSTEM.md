@@ -105,7 +105,7 @@ All templates keep the v1 idiom: prompt → rename → write frontmatter via `pr
 | `ProjectFileTemplate` | Note inside a project folder | Prompts `Type` (Resource/Idea/Source), **inherits** the project index's tags, optionally adds topics; Parent → project `00000`. |
 | `ResourceTemplate` | Note in `RESOURCES/` | Pick area hub + topics; `Type: Resource`; Parent → hub. |
 | `IdeaTemplate` | Permanent note | Pick area hub + topics + maturity (`status: seed` default); adds `source-notes: []`; Parent → hub. Body ends with a live **Related notes** footer (dataviewjs: every note sharing a `topic/*` tag). |
-| `SourceTemplate` | Capture in `Inbox/` | Unchanged from v1 intake plan (`Type: Source`, `reading_status: inbox`, `source:` URL, digest checklist). Tags deferred to the Idea note. |
+| `SourceTemplate` | Capture in `Inbox/` | **Share-aware.** Guard skips notes already stamped `Type: Source` (Web Clipper); extracts the first URL from the body if present (Android share) instead of prompting; uses the filename as title unless "Untitled". Frontmatter written via API (`Type: Source`, `reading_status: inbox`, `source:`). Also auto-applied by Templater's folder template to any new file in `Inbox/`. Tags deferred to the Idea note. |
 | `TasksTemplate` | Kanban board in a project folder | Inherits the project's `area/*` tag from `00000.md`; `Type: Tasks`, `kanban-plugin: board`, Backlog / In Progress / Done lists. |
 | `DailyNoteTemplate` | Daily health log | `Type: Daily`, `tags: [area/health]`; Modal Forms `master_health_log` unchanged. |
 
@@ -137,9 +137,12 @@ Unchanged from v1 — see `.obsidian/community-plugins.json`. Load-bearing: **Te
 
 ## 7. Workflows
 
+Capture setup and per-device usage (QuickAdd, phone share sheet, Web Clipper): see [[Capture — Setup and Usage]].
+
 - **New area:** create note in `AREAS/` from `AreaIndexTemplate`. That's the whole operation — no folder.
 - **New project:** create folder in `PROJECTS/`, add `00000.md` from `ProjectIndexTemplate`, optionally a board from `TasksTemplate`.
 - **Capture (in-vault):** press `Cmd/Ctrl+Shift+S` — the QuickAdd "New Source" command creates a stamped Source note in `Inbox/` and prompts for title + URL. The Web Clipper covers capture from the browser.
+- **Capture (phone, share sheet):** new notes default to `Inbox/`, and a Templater folder template auto-runs `SourceTemplate` on any new file there. Share a page → Obsidian creates the note → the template detects the URL in the body and the title in the filename and stamps the full Source frontmatter. A guard skips notes that arrive already stamped (Web Clipper). Caveat: Templater may skip auto-applying to files created with content — if a shared note comes through raw, insert `SourceTemplate` manually; the same detection logic runs.
 - **Capture → integrate (intake v1, unchanged):** clip/capture → `Inbox/` `Type: Source` → read & highlight → write `Type: Idea` note(s) in your own words (tags assigned here), backlink both ways, flip `reading_status: integrated`.
 - **New task with a note:** add a card to the project board; if the task deserves a note, create the note (any type) and put its wikilink first in the card.
 - **Develop ideas:** new Idea notes start as `status: seed` and sit in the Index's "Seeds needing development" table until promoted to `developing`, then `evergreen` (edit the field by hand). The related-notes footer on each Idea note and the serendipity block on the Index exist to trigger collisions between ideas.
