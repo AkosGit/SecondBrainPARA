@@ -46,15 +46,15 @@ In the clipper's settings, create a new template (call it `Source`) and set:
 
 **Properties** (add each one; types: text unless noted):
 
-| Property | Value | Property type |
-|---|---|---|
-| `Type` | `Source` | text |
-| `Parent` | `[[Inbox/00000\|Link]]` | text |
-| `reading_status` | `inbox` | text |
-| `source` | `{{url}}` | text |
-| `author` | `{{author}}` | text |
-| `ideas-extracted` | *(leave empty)* | list |
-| `tags` | *(leave empty)* | list |
+| Property          | Value                   | Property type |
+| ----------------- | ----------------------- | ------------- |
+| `Type`            | `Source`                | text          |
+| `Parent`          | `[[Inbox/00000\|Link]]` | text          |
+| `reading_status`  | `inbox`                 | text          |
+| `source`          | `{{url}}`               | text          |
+| `author`          | `{{author}}`            | text          |
+| `ideas-extracted` | *(leave empty)*         | list          |
+| `tags`            | *(leave empty)*         | list          |
 
 Spelling matters: `reading_status` with an underscore, `Source` capitalised. A typo here and the capture never shows up in the queue.
 

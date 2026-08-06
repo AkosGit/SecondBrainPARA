@@ -11,16 +11,14 @@
             "id": "e7a7b303c61786dc",
             "type": "leaf",
             "state": {
-              "type": "pdf",
+              "type": "markdown",
               "state": {
-                "file": "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/Tételek-kidolgozva.pdf",
-                "page": 15,
-                "left": -13,
-                "top": 7,
-                "zoom": 1.2588205645161288
+                "file": "SYSTEM.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-file-text",
-              "title": "Tételek-kidolgozva"
+              "icon": "lucide-file",
+              "title": "SYSTEM"
             }
           }
         ]
@@ -43,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -162,6 +162,16 @@
               "icon": "SpacedRepIcon",
               "title": "Notes Review Queue"
             }
+          },
+          {
+            "id": "5491aa07130b3931",
+            "type": "leaf",
+            "state": {
+              "type": "review-queue-list-view",
+              "state": {},
+              "icon": "SpacedRepIcon",
+              "title": "Notes Review Queue"
+            }
           }
         ],
         "currentTab": 4
@@ -194,28 +204,42 @@
   },
   "active": "e7a7b303c61786dc",
   "lastOpenFiles": [
+    "paravault-clipper-config.json",
+    "paravault-clipper.json",
+    "Information Intake — v1 Setup Checklist.md",
+    "How to Use This Vault — Walkthrough.md",
+    "Capture — Setup and Usage.md",
+    "orphaned files output.md",
+    "Information intake.md",
+    "Inbox/00000.md",
+    "Index.md",
+    "Inbox/Hugging Face.md",
+    "PROJECTS/Sweqting/00000.md",
+    "Boards.md",
+    "PROJECTS/Sweqting/Sweqting Tasks.md",
+    "PROJECTS/Fatigue/test file.md",
+    "PROJECTS/Sweqting/test file.md",
+    "SYSTEM.md",
+    "RESOURCES/test resource.md",
+    "Inbox/test file.md",
+    "PROJECTS/Sweqting/test idea.md",
+    "PROJECTS/Sweqting/good idea.md",
+    "PROJECTS/Sweqting/water.md",
+    "PROJECTS/Fatigue/Fatigue Tasks.md",
+    "PROJECTS/Fatigue/00000.md",
+    "PROJECTS/Sweqting",
+    "PROJECTS/Sweating/00000.md",
+    "PROJECTS/Sweating",
+    "AREAS/Health.md",
+    "PROJECTS/Fatigue",
+    "AREAS/Health/Untitled.md",
+    "AREAS/Health",
     "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/valszam_elmélet_kerdesek.pdf",
     "PROJECTS/Valszám/00000.md",
-    "PROJECTS/taxes/Setup.md",
-    "PROJECTS/taxes/Monthly process.md",
-    "PROJECTS/taxes/00000.md",
     "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/Tételek-kidolgozva.pdf",
     "PROJECTS/taxes",
-    "Index.md",
     "PROJECTS/Valszám/Vizsgák/Elmélet/2015ösök.pdf",
     "PROJECTS/Valszám/Vizsgák/Elmélet/becskieg.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/CsebNsztCht_kepletek.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/EddigiElmeletiVizsgakerdesekKidolgozva.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/összes_elméleti_kérdés_üres.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/p152k2m.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/valsz_full.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/Valszám Vizsga kérdések válaszokkal 2015.pdf",
-    "PROJECTS/Article writing/Deep research tools and benchmark.md",
-    "PROJECTS/Article writing/Transcript article.md",
-    "PROJECTS/Article writing/Agentic project.md",
-    "PROJECTS/Article writing/Extending your mind using LLMs part 1.md",
-    "Untitled 7.md",
-    "Untitled 8.md",
     "PROJECTS/Valszám/Vizsgák/2016_06_10_4.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_4.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_3.jpg",
@@ -225,20 +249,6 @@
     "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/feladat_2.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/feladat_1.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/2015_05_22_4.jpg",
-    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/2015_05_22_3.jpg",
-    "Time and time again.md",
-    "PROJECTS/João work/Market research strategies.md",
-    "PROJECTS/João work/TODO.md",
-    "PROJECTS/Valszám/Több eloszlás.md",
-    "poison binom.md",
-    "Untitled 1.md",
-    "Untitled.md",
-    "Untitled 2.md",
-    "Untitled 3.md",
-    "Untitled 4.md",
-    "Untitled 5.md",
-    "Untitled 6.md",
-    "PROJECTS/poems/00000.md",
-    "PROJECTS/Valszám/Feltételes valószínüség, függetlenség.md"
+    "PROJECTS/Valszám/Vizsgák/Vizsga_2015_05_22/2015_05_22_3.jpg"
   ]
 }

@@ -1,25 +1,24 @@
 <%*
+const folderPath = tp.file.folder(true);   // e.g. "PROJECTS/Fatigue"
+const folderName = tp.file.folder();       // e.g. "Fatigue"
+
 let title = tp.file.title;
-if (title.startsWith("Untitled")) {
-  title = tp.file.folder() + " Tasks";
-}
-await tp.file.rename(title);
+if (title.startsWith("Untitled")) { title = folderName + " Tasks"; }
+if (title !== tp.file.title) { await tp.file.rename(title); }
 
-setTimeout(async () => {
-  const folder = tp.file.folder();
-  const idx = await tp.file.find_tfile(`${folder}/00000.md`);
-  const idxFm = app.metadataCache.getFileCache(idx)?.frontmatter ?? {};
-  const inherited = (idxFm.tags ?? []).map(String).filter(t => t.startsWith("area/"));
-
-  app.fileManager.processFrontMatter(tp.config.target_file, fm => {
-    fm["Parent"] = `[[PROJECTS/${folder}/00000|Link]]`;
-    fm["Type"] = "Tasks";
-    fm["Project"] = folder;
-    fm["tags"] = inherited;
-    fm["kanban-plugin"] = "board";
-  });
-}, 200);
+const idx = app.vault.getAbstractFileByPath(`${folderPath}/00000.md`);
+const areaTags = (idx ? (app.metadataCache.getFileCache(idx)?.frontmatter?.tags ?? []) : [])
+  .map(String).filter(t => t.startsWith("area/"));
+const tagBlock = areaTags.length ? areaTags.map(t => "  - " + t).join("\n") : "  []";
 -%>
+---
+Parent: "[[<% folderPath %>/00000|Link]]"
+Type: Tasks
+Project: "<% folderName %>"
+kanban-plugin: board
+tags:
+<% tagBlock %>
+---
 
 ## Backlog
 

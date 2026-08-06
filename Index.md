@@ -3,6 +3,8 @@ Type: Index
 ---
 # Index
 
+*New here? [[How to Use This Vault — Walkthrough]] · [[Capture — Setup and Usage]] · [[SYSTEM]]*
+
 ## Tasks
 
 ### In Progress

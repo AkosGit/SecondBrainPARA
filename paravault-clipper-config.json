@@ -1,0 +1,46 @@
+{
+	"schemaVersion": "0.1.0",
+	"name": "ParaVault",
+	"behavior": "create",
+	"noteContentFormat": "# {{title}}\n\n## Highlights\n{{highlights}}\n\n## Digest — owes an Idea note\n- [ ] Cluster highlights by concept (not by the source's chapter order)\n- [ ] Write Idea note(s) in your own words; backlink this Source\n- [ ] Add the Idea link to `ideas-extracted`, set `reading_status: integrated`",
+	"properties": [
+		{
+			"name": "Type",
+			"value": "Source",
+			"type": "text"
+		},
+		{
+			"name": "Parent",
+			"value": "[[Inbox/00000|Link]]",
+			"type": "text"
+		},
+		{
+			"name": "reading_status",
+			"value": "inbox",
+			"type": "text"
+		},
+		{
+			"name": "source",
+			"value": "{{url}}",
+			"type": "text"
+		},
+		{
+			"name": "author",
+			"value": "{{author}}",
+			"type": "text"
+		},
+		{
+			"name": "ideas-extracted",
+			"value": "",
+			"type": "multitext"
+		},
+		{
+			"name": "tags",
+			"value": "",
+			"type": "multitext"
+		}
+	],
+	"triggers": [],
+	"noteNameFormat": "{{title}}",
+	"path": "Inbox"
+}
