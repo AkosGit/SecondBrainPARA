@@ -122,7 +122,7 @@ You read the paper and highlight as you go, into its `## Highlights` section. Hi
 
 **Do:** cluster the highlights by concept (not by the paper's chapter order). One cluster stands out: attribution models fail because they assume linear journeys. That's one idea → one note.
 
-Create a note → `IdeaTemplate` → *Area?* `Learning` → *Topics?* `analytics/attribution` → *Maturity?* `seed`.
+Create a note → `IdeaTemplate` → *Area?* `Learning` → *Topics?* `analytics/attribution` → *Maturity?* `seed` → *Source note(s)?* `Multi-Touch Attribution Models`. The note lands in `IDEAS/`, and picking the source there fills `source-notes` on the idea and `ideas-extracted` on the paper in one pass.
 
 **You get:**
 
@@ -149,7 +149,32 @@ Scroll to the bottom of your new idea note — the **Related notes** footer alre
 
 ---
 
-## Example 6 — Developing ideas over time
+## Example 6 — An idea that came from nowhere
+
+Walking to lunch, it occurs to you that clients never ask for attribution — they ask "which channel do I cut". Nothing prompted it. There's no source.
+
+**Do:** press `Cmd/Ctrl+Shift+I` → *Idea?* `Clients ask what to cut, not what works` → *Area?* `Consulting`. Done — two prompts, no topics, no maturity question.
+
+**You get,** in `IDEAS/`:
+
+```yaml
+---
+Parent: "[[AREAS/Consulting|Link]]"
+Type: Idea
+status: seed
+source-notes: []
+tags:
+  - area/consulting
+---
+```
+
+`source-notes: []` is the whole record of "this came from my head" — and it's the *only* difference from the note in Example 5. Both are `Type: Idea`, both live in `IDEAS/`, both show up in the same tables. **Where an idea came from is frontmatter, not a folder.** Filing sourceless ideas somewhere separate would mean two homes for one type, and no memory of which one you used.
+
+Nothing else is asked of you at capture, because a thought you're chasing down mid-thought is a thought you lose. The Index will keep it in "Seeds needing development" until you come back and add topics, which is where classification belongs anyway.
+
+---
+
+## Example 7 — Developing ideas over time
 
 A `seed` is a note you dropped and walked away from. The Index's **"Seeds needing development"** table keeps every `seed` and `developing` idea visible until you promote it.
 
@@ -165,7 +190,7 @@ Two more nudges live on [[Index]]: the **serendipity block** shows three random 
 
 ---
 
-## Example 7 — When a topic gets crowded
+## Example 8 — When a topic gets crowded
 
 Six months in, `topic/analytics/attribution` has 12 notes. That's your signal — not before.
 
@@ -175,13 +200,17 @@ Six months in, `topic/analytics/attribution` has 12 notes. That's your signal �
 
 ---
 
-## Example 8 — Finishing a project
+## Example 9 — Finishing a project
 
-The Acme audit ships. **Do:** drag `PROJECTS/Acme Analytics Audit/` into `ARCHIVE/`. That's it.
+The Acme audit ships. Two moves, in this order.
 
-The tags travel with the files, so the project drops off the active list and appears under "Archived projects" on [[Index]] automatically. Anything worth keeping beyond the engagement — the naming convention, the lessons — should already be an `Idea` or `Resource` note tagged by topic, so it stays findable after the project is cold.
+**First, promote what the project produced.** The event naming convention you wrote is a **finished artifact** — that's what `Type: Resource` means. Move it to `RESOURCES/`. The lesson you drew about clients asking what to cut is thinking, not an artifact — move it to `IDEAS/`. Everything else (working notes, the half-finished draft, the meeting scraps) stays put.
 
-This folder move is the **only** time the system asks you to file anything by hand.
+**Then drag `PROJECTS/Acme Analytics Audit/` into `ARCHIVE/`.**
+
+The split is about what you'll want later: `ARCHIVE/` is the record of *how the work happened*, and you'll rarely open it. `RESOURCES/` and `IDEAS/` are the things that outlive the engagement and stay live. Tags travel with the files either way, so the project drops off the active list and appears under "Archived projects" on [[Index]] automatically.
+
+These two folder moves are the **only** time the system asks you to file anything by hand.
 
 ---
 
@@ -190,22 +219,24 @@ This folder move is the **only** time the system asks you to file anything by ha
 | I want to… | Do this |
 |---|---|
 | Save something to read | `Cmd/Ctrl+Shift+S`, or share to Obsidian from your phone |
+| Catch an idea before it's gone | `Cmd/Ctrl+Shift+I` — title + area, lands in `IDEAS/` as `status: seed` |
 | Start an area | New note in `AREAS/` → `AreaIndexTemplate` |
 | Start a project | New folder in `PROJECTS/` → note → `ProjectIndexTemplate` → then `TasksTemplate` |
 | Add a note to a project | Note in the project folder → `ProjectFileTemplate` (pick Resource/Idea/Source) |
-| Write a permanent note | `IdeaTemplate` — area + topics + maturity |
-| Add reference material | `ResourceTemplate` into `RESOURCES/` |
+| Write an idea properly | `IdeaTemplate` — area + topics + maturity + source notes; lands in `IDEAS/` |
+| File something you finished | `ResourceTemplate` into `RESOURCES/` |
 | Make a task clickable on the Index | Put its note's `[[wikilink]]` first in the kanban card |
 | Mark reading done | Write the idea note, backlink both ways, `reading_status: integrated` |
 | Promote an idea | Edit `status:` → `developing` → `evergreen` |
-| Finish a project | Move its folder to `ARCHIVE/` |
+| Finish a project | Promote its artifacts to `RESOURCES/`, then move the folder to `ARCHIVE/` |
 
-## Five rules that keep it working
+## Six rules that keep it working
 
 1. **One area per note, topics as many as fit.** The single area is what stops the vault becoming a tag soup where everything belongs everywhere.
 2. **Never hand-write frontmatter.** Always a template. Hand-typed tags drift (`#analytics` vs `#Analytics`) and drifted tags are invisible to queries.
 3. **Capture is dumb, classification is deliberate.** Tag on the way out (the idea), never on the way in (the source).
 4. **The board owns task status. Frontmatter never does.**
 5. **Reading is done when an idea note exists in your own words.** Not when you've highlighted it. Not when you've saved it.
+6. **A Resource is something you finished.** If it's still moving, it's an `Idea` with a `status`. Keeping unfinished work out of `RESOURCES/` is what stops it becoming a graveyard.
 
 The technical contract behind all of this: [[SYSTEM]]. Capture setup: [[Capture — Setup and Usage]].

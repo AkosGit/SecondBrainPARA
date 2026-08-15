@@ -29,36 +29,6 @@
       "openFileInMode": "default",
       "fileExistsMode": "Increment the file name",
       "setFileExistsBehavior": false
-    },
-    {
-      "id": "b1e4c8a2-3f6d-4a17-9c5b-2d8e0f4a7c31",
-      "name": "New Idea",
-      "type": "Template",
-      "command": true,
-      "templatePath": "Templates/QuickIdeaTemplate.md",
-      "fileNameFormat": {
-        "enabled": true,
-        "format": "Untitled Idea {{DATE:YYYYMMDDHHmmss}}"
-      },
-      "folder": {
-        "enabled": true,
-        "folders": [
-          "IDEAS"
-        ],
-        "chooseWhenCreatingNote": false,
-        "createInSameFolderAsActiveFile": false,
-        "chooseFromSubfolders": false
-      },
-      "appendLink": false,
-      "openFileInNewTab": {
-        "enabled": false,
-        "direction": "vertical",
-        "focus": true
-      },
-      "openFile": true,
-      "openFileInMode": "default",
-      "fileExistsMode": "Increment the file name",
-      "setFileExistsBehavior": false
     }
   ],
   "macros": [],

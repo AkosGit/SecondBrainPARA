@@ -81,7 +81,17 @@ let title = tp.file.title;
 if (title.startsWith("Untitled")) {
   title = (await tp.system.prompt("Title")) ?? title;
 }
-if (title !== tp.file.title) { await tp.file.rename(title); }
+/* Standalone ideas live in IDEAS/. Ideas scoped to a project stay in the
+   project folder, same split RESOURCES/ already has. */
+const startPath = tp.config.target_file.path;
+const scoped = startPath.startsWith("PROJECTS/")
+  || startPath.startsWith("ARCHIVE/")
+  || startPath.startsWith("IDEAS/");
+if (!scoped) {
+  await tp.file.move("IDEAS/" + title);
+} else if (title !== tp.file.title) {
+  await tp.file.rename(title);
+}
 
 const area = await pickAreaHub();
 const topics = await pickTopicTags();

@@ -8,6 +8,8 @@ tags:
 
 How to get anything — article, paper, link someone mentions — into `Inbox/` as a properly stamped `Type: Source` note, from any device. Four routes, all landing in the same reading queue on [[Index]].
 
+*Capturing your own thoughts rather than someone else's material is a different path — see [§5](#5-capturing-your-own-ideas) at the bottom.*
+
 | Route | When | Setup status |
 |---|---|---|
 | QuickAdd hotkey | You're inside Obsidian (desktop or mobile) | ✅ configured |
@@ -174,6 +176,18 @@ Set `Source` as the default template so one click clips correctly.
 - **iOS:** Share → Obsidian Web Clipper → clip. Same template applies.
 
 The Templater guard in `SourceTemplate` recognises clipper notes as already stamped and leaves them alone — no double-processing.
+
+---
+
+## 5. Capturing your own ideas
+
+Everything above is for material someone else made. An idea of your own never touches `Inbox/` — it has no `source:`, so it isn't a Source, and the reading queue would be the wrong place for it.
+
+**Press `Cmd/Ctrl+Shift+I`** — QuickAdd "New Idea" asks two things, the idea's title and its area, and drops a note into `IDEAS/` stamped `Type: Idea`, `status: seed`, `source-notes: []`. That's the whole capture. Topics and maturity are deliberately deferred: the Index's "Seeds needing development" table will keep showing the note until you go back and develop it, which is the nag doing its job.
+
+On mobile, add the command to the toolbar the same way as New Source: Settings → Toolbar → add "QuickAdd: New Idea".
+
+**When to use the full `IdeaTemplate` instead** (insert it via Templater, or run it on an existing note): when you're sitting down to write properly, and especially when the idea came *out of* something you read. Its source picker links the Source note both ways — `source-notes` on the idea, `ideas-extracted` on the source — and offers to flip `reading_status: integrated` in the same pass. Both kinds of idea end up in `IDEAS/`; where an idea came from is recorded in its frontmatter, not in its location.
 
 ---
 

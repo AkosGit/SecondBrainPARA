@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "SYSTEM.md",
+                "file": "Index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SYSTEM"
+              "title": "Index"
             }
           }
         ]
@@ -204,6 +204,9 @@
   },
   "active": "e7a7b303c61786dc",
   "lastOpenFiles": [
+    "Templates/QuickIdeaTemplate.md",
+    "IDEAS",
+    "SYSTEM.md",
     "paravault-clipper-config.json",
     "paravault-clipper.json",
     "Information Intake — v1 Setup Checklist.md",
@@ -219,7 +222,6 @@
     "PROJECTS/Sweqting/Sweqting Tasks.md",
     "PROJECTS/Fatigue/test file.md",
     "PROJECTS/Sweqting/test file.md",
-    "SYSTEM.md",
     "RESOURCES/test resource.md",
     "Inbox/test file.md",
     "PROJECTS/Sweqting/test idea.md",
@@ -238,8 +240,6 @@
     "PROJECTS/Valszám/00000.md",
     "PROJECTS/Valszám/Vizsgák/Elmélet/kidolgozott_kérdések/Tételek-kidolgozva.pdf",
     "PROJECTS/taxes",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/2015ösök.pdf",
-    "PROJECTS/Valszám/Vizsgák/Elmélet/becskieg.pdf",
     "PROJECTS/Valszám/Vizsgák/2016_06_10_4.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_4.jpg",
     "PROJECTS/Valszám/Vizsgák/Vizsga_2016_06_10/2016_06_10_3.jpg",

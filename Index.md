@@ -95,12 +95,22 @@ WHERE Type = "Source" AND reading_status = "integrated"
 
 ## Ideas
 
+*Standalone ideas live in `IDEAS/`; ideas scoped to a project live in that project's folder.*
+
 ### Seeds needing development
 ```dataview
 TABLE status AS "Status", join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics"
 FROM ""
 WHERE Type = "Idea" AND (status = "seed" OR status = "developing")
 SORT status ASC
+```
+
+### All ideas
+```dataview
+TABLE status AS "Status", join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics", file.folder AS "Where"
+FROM ""
+WHERE Type = "Idea"
+SORT status ASC, file.name ASC
 ```
 
 ### Serendipity — three random ideas
@@ -137,6 +147,9 @@ for (const key of keys) {
 ```
 
 ## Resources
+
+*Finished artifacts — work that's done. Unfinished thinking belongs in `IDEAS/`.*
+
 ```dataview
 TABLE join(filter(file.etags, (t) => startswith(t, "#topic/")), ", ") AS "Topics"
 FROM "RESOURCES"
@@ -154,7 +167,7 @@ WHERE file.name = "00000"
 ### Notes without a Parent link
 ```dataview
 LIST
-FROM "PROJECTS" OR "AREAS" OR "RESOURCES" OR "Inbox"
+FROM "PROJECTS" OR "AREAS" OR "RESOURCES" OR "IDEAS" OR "Inbox"
 WHERE !Parent
 ```
 
@@ -163,4 +176,11 @@ WHERE !Parent
 LIST
 FROM "PROJECTS"
 WHERE file.name = "00000" AND length(filter(file.etags, (t) => startswith(t, "#area/"))) = 0
+```
+
+### Ideas without an area tag
+```dataview
+LIST
+FROM ""
+WHERE Type = "Idea" AND length(filter(file.etags, (t) => startswith(t, "#area/"))) = 0
 ```
