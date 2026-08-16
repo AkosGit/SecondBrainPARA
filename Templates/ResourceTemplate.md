@@ -1,9 +1,45 @@
 <%*
+/* A Resource is a FINISHED ARTIFACT (SYSTEM.md §1.2).
+
+   This template is location-aware, so it does the right thing wherever you run it:
+   - inside PROJECTS/<X>/ or ARCHIVE/<X>/ → a project deliverable. Parent → the
+     project's 00000, stamps `Project:`, inherits the project index's tags, and
+     offers a board card. Identical result to ProjectFileTemplate → Resource.
+   - anywhere else → a standalone artifact. Moves the note to RESOURCES/ and
+     asks for area + topics.
+   ⚠️ `addBoardCard()` is duplicated from `ProjectFileTemplate.md` — keep in sync. */
 function slugify(s) {
   return String(s).trim().toLowerCase().replace(/[^a-z0-9/]+/g, "-").replace(/^-+|-+$/g, "");
 }
 function yamlList(items) {
   return items.length ? items.map(t => "  - " + t).join("\n") : "  []";
+}
+async function addBoardCard(folderPath, noteFile, noteTitle) {
+  const list = await tp.system.suggester(
+    ["Backlog", "In Progress", "No card"], ["Backlog", "In Progress", null],
+    false, "Add a card to the project board?");
+  if (!list) return;
+  const inFolder = app.vault.getMarkdownFiles().filter(f => f.parent?.path === folderPath);
+  const board = inFolder.find(f => {
+    const fm = app.metadataCache.getFileCache(f)?.frontmatter;
+    return fm?.Type === "Tasks" || fm?.["kanban-plugin"] === "board";
+  }) ?? inFolder.find(f => /\bTasks$/i.test(f.basename));
+  if (!board) {
+    new Notice(`No board found in ${folderPath} — card skipped. Add one with TasksTemplate.`, 8000);
+    return;
+  }
+  const lines = (await app.vault.read(board)).split("\n");
+  const start = lines.findIndex(l => l.trim() === "## " + list);
+  if (start === -1) { new Notice(`No "${list}" list on the board — card skipped.`, 8000); return; }
+  let end = start + 1;
+  while (end < lines.length
+      && !/^##\s/.test(lines[end])
+      && !/^%%\s*kanban:settings/.test(lines[end])) end++;
+  let last = end - 1;
+  while (last > start && lines[last].trim() === "") last--;
+  lines.splice(last + 1, 0, `- [ ] [[${noteFile.path.replace(/\.md$/, "")}|${noteTitle}]]`);
+  await app.vault.modify(board, lines.join("\n"));
+  new Notice(`Added to ${list}: ${noteTitle}`);
 }
 function allFrontmatterTags(prefix) {
   const out = new Set();
@@ -51,16 +87,40 @@ let title = tp.file.title;
 if (title.startsWith("Untitled")) {
   title = (await tp.system.prompt("Title")) ?? title;
 }
-await tp.file.rename(title);
 
-const area = await pickAreaHub();
-const topics = await pickTopicTags();
-const tagBlock = yamlList([area.tag, ...topics]);
+const startPath = tp.config.target_file.path;
+const inProject = startPath.startsWith("PROJECTS/") || startPath.startsWith("ARCHIVE/");
+const folderPath = tp.file.folder(true);
+const folderName = tp.file.folder();
+
+let parentLink, extraFields, tagBlock;
+
+if (inProject) {
+  if (title !== tp.file.title) { await tp.file.rename(title); }
+  const idx = app.vault.getAbstractFileByPath(`${folderPath}/00000.md`);
+  const idxTags = (idx ? (app.metadataCache.getFileCache(idx)?.frontmatter?.tags ?? []) : []).map(String);
+  const extraTopics = await pickTopicTags();
+  tagBlock = yamlList(Array.from(new Set([...idxTags, ...extraTopics])));
+  parentLink = `${folderPath}/00000`;
+  extraFields = `Project: "${folderName}"\n`;
+  await addBoardCard(folderPath, tp.config.target_file, title);
+} else {
+  if (!startPath.startsWith("RESOURCES/")) {
+    await tp.file.move("RESOURCES/" + title);
+  } else if (title !== tp.file.title) {
+    await tp.file.rename(title);
+  }
+  const area = await pickAreaHub();
+  const topics = await pickTopicTags();
+  tagBlock = yamlList([area.tag, ...topics]);
+  parentLink = `AREAS/${area.hubName}`;
+  extraFields = "";
+}
 -%>
 ---
-Parent: "[[AREAS/<% area.hubName %>|Link]]"
+Parent: "[[<% parentLink %>|Link]]"
 Type: Resource
-tags:
+<% extraFields %>tags:
 <% tagBlock %>
 ---
 # <% title %>

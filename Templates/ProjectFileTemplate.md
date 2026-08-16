@@ -56,17 +56,27 @@ async function backlinkSources(sources, ideaFile, ideaTitle) {
    but a wikilink renders on the Index as the note's title — see SYSTEM.md §4.
    The board is the source of truth for status, so the card carries no metadata. */
 async function addBoardCard(folderPath, noteFile, noteTitle) {
-  const board = app.vault.getMarkdownFiles()
-    .filter(f => f.parent?.path === folderPath)
-    .find(f => app.metadataCache.getFileCache(f)?.frontmatter?.Type === "Tasks");
-  if (!board) { new Notice("No board in this project — card skipped."); return; }
+  /* Ask FIRST, look for the board second. Doing it the other way round meant a
+     project without a board bailed out before prompting, so the feature looked
+     broken instead of looking like "this project has no board". */
   const list = await tp.system.suggester(
     ["Backlog", "In Progress", "No card"], ["Backlog", "In Progress", null],
-    false, "Add a card to the board?");
+    false, "Add a card to the project board?");
   if (!list) return;
+  /* Frontmatter first, then filename — a board created moments ago (by
+     ProjectIndexTemplate) may not be in the metadata cache yet. */
+  const inFolder = app.vault.getMarkdownFiles().filter(f => f.parent?.path === folderPath);
+  const board = inFolder.find(f => {
+    const fm = app.metadataCache.getFileCache(f)?.frontmatter;
+    return fm?.Type === "Tasks" || fm?.["kanban-plugin"] === "board";
+  }) ?? inFolder.find(f => /\bTasks$/i.test(f.basename));
+  if (!board) {
+    new Notice(`No board found in ${folderPath} — card skipped. Add one with TasksTemplate.`, 8000);
+    return;
+  }
   const lines = (await app.vault.read(board)).split("\n");
   const start = lines.findIndex(l => l.trim() === "## " + list);
-  if (start === -1) { new Notice(`No "${list}" list on the board — card skipped.`); return; }
+  if (start === -1) { new Notice(`No "${list}" list on the board — card skipped.`, 8000); return; }
   /* Walk to the end of this list, then back up over trailing blank lines so the
      card lands under the last existing card rather than in the gap below it. */
   let end = start + 1;
