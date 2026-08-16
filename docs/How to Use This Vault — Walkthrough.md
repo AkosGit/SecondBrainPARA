@@ -59,9 +59,11 @@ tags:
 ---
 ```
 
-The project index body auto-lists its board and its files grouped by topic. The project now also appears on `AREAS/Consulting.md` and under "Consulting" on [[Index]] — without you touching either file.
+**And you get the board, free.** `Acme Analytics Audit Tasks.md` is created in the same folder at the same moment — Backlog / In Progress / Done, `kanban-plugin: board`, inheriting `area/consulting`. You don't insert `TasksTemplate` yourself; that's now only for adding a board to an older project that never got one. If a board already exists in the folder, nothing is overwritten.
 
-**Then add a board:** new note in the same folder → insert `TasksTemplate` → it becomes `Acme Analytics Audit Tasks.md` with Backlog / In Progress / Done and inherits `area/consulting`.
+The project index body auto-lists that board and the project's files grouped by topic. The project also appears on `AREAS/Consulting.md` and under "Consulting" on [[Index]] — without you touching either file.
+
+So a project is **one folder and one note**. Everything else assembles itself.
 
 ---
 
@@ -74,13 +76,23 @@ On the board, most cards are just text:
 - [ ] Export current event taxonomy
 ```
 
-But "Rewrite the event naming convention" is real work with substance. So you create a note for it — new note in the project folder → `ProjectFileTemplate` → *Type?* `Resource` → topics inherited — and then **put its link first in the card**:
+But "Rewrite the event naming convention" is real work with substance. So you create a note for it — new note in the project folder → `ProjectFileTemplate` → *Type?* `Resource` → topics inherited → *Add a card to the board?* `Backlog`.
+
+That last prompt writes the card for you, link only:
+
+```
+- [ ] [[PROJECTS/Acme Analytics Audit/Event naming convention v2|Event naming convention v2]]
+```
+
+It only appears for `Resource` notes — a Resource inside a project is a deliverable, so it usually owes a task. Pick *No card* when it doesn't. Ideas and Sources never prompt; add those cards by hand if you want them.
+
+**Adding detail by hand.** The card is yours to edit afterwards — a due date, a note on what "done" means:
 
 ```
 - [ ] [[Event naming convention v2]] — draft and get sign-off @{2026-08-10}
 ```
 
-**What that buys you:** on [[Index]], the Backlog and In Progress tables show *Event naming convention v2* as a clickable link instead of raw card text. Cards without links still show their text — linking is optional, use it when the task has thinking behind it.
+**What that buys you:** on [[Index]], the Backlog and In Progress tables show *Event naming convention v2* as a clickable link instead of raw card text. The **first** link in a card is the one that wins, so keep it first when you add prose. Cards without links still show their text — linking is optional, use it when the task has thinking behind it.
 
 **Status lives on the board, never in frontmatter.** A task is "in progress" because its card sits in the In Progress list. Drag the card, and the Index updates. Don't add a `status` field to task notes — that's two sources of truth.
 
@@ -221,8 +233,9 @@ These two folder moves are the **only** time the system asks you to file anythin
 | Save something to read | `Cmd/Ctrl+Shift+S`, or share to Obsidian from your phone |
 | Catch an idea before it's gone | `Cmd/Ctrl+Shift+I` — title + area, lands in `IDEAS/` as `status: seed` |
 | Start an area | New note in `AREAS/` → `AreaIndexTemplate` |
-| Start a project | New folder in `PROJECTS/` → note → `ProjectIndexTemplate` → then `TasksTemplate` |
-| Add a note to a project | Note in the project folder → `ProjectFileTemplate` (pick Resource/Idea/Source) |
+| Start a project | New folder in `PROJECTS/` → note → `ProjectIndexTemplate` (the board is created for you) |
+| Add a board to an old project | Note in the project folder → `TasksTemplate` |
+| Add a note to a project | Note in the project folder → `ProjectFileTemplate` (pick Resource/Idea/Source; a Resource also offers a board card) |
 | Write an idea properly | `IdeaTemplate` — area + topics + maturity + source notes; lands in `IDEAS/` |
 | File something you finished | `ResourceTemplate` into `RESOURCES/` |
 | Make a task clickable on the Index | Put its note's `[[wikilink]]` first in the kanban card |

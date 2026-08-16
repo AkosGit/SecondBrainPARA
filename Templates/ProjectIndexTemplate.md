@@ -47,6 +47,54 @@ async function pickTopicTags() {
   }
   return chosen;
 }
+/* The project's kanban board, created alongside this index.
+
+   This deliberately does NOT invoke `TasksTemplate`: that template reads the
+   project index's frontmatter out of the metadata cache to inherit the area
+   tag, and at this moment the index note has not been written yet — the cache
+   would come back empty and the board would land with `tags: []`. Same class of
+   race as the v2.0 frontmatter bug (SYSTEM.md §3). So the board is emitted from
+   the variables already in hand.
+
+   ⚠️ KEEP IN SYNC with `TasksTemplate.md` — the two produce the same skeleton
+   and `TasksTemplate` is still the manual path for a project that has no board. */
+async function createBoard(folderPath, folderName, areaTag) {
+  const existing = app.vault.getMarkdownFiles()
+    .filter(f => f.parent?.path === folderPath)
+    .find(f => app.metadataCache.getFileCache(f)?.frontmatter?.Type === "Tasks");
+  if (existing) return;
+  const path = `${folderPath}/${folderName} Tasks.md`;
+  if (app.vault.getAbstractFileByPath(path)) return;
+  const body = [
+    "---",
+    `Parent: "[[${folderPath}/00000|Link]]"`,
+    "Type: Tasks",
+    `Project: "${folderName}"`,
+    "kanban-plugin: board",
+    "tags:",
+    areaTag ? "  - " + areaTag : "  []",
+    "---",
+    "",
+    "## Backlog",
+    "",
+    "## In Progress",
+    "",
+    "## Done",
+    "",
+    "%% kanban:settings",
+    "```",
+    '{"kanban-plugin":"board","list-collapse":[false,false,false],"show-checkboxes":false}',
+    "```",
+    "%%",
+    "",
+  ].join("\n");
+  try {
+    await app.vault.create(path, body);
+    new Notice(`Board created: ${folderName} Tasks`);
+  } catch (e) {
+    new Notice(`Board not created: ${e.message}`);
+  }
+}
 let title = tp.file.title;
 if (title.startsWith("Untitled")) { title = "00000"; }
 await tp.file.rename(title);
@@ -54,6 +102,8 @@ await tp.file.rename(title);
 const area = await pickAreaHub();
 const topics = await pickTopicTags();
 const tagBlock = yamlList([area.tag, ...topics]);
+
+await createBoard(tp.file.folder(true), tp.file.folder(), area.tag);
 -%>
 ---
 Parent: "[[AREAS/<% area.hubName %>|Link]]"

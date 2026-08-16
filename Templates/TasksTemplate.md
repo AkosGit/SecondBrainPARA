@@ -1,4 +1,9 @@
 <%*
+/* Manual path: adds a board to a project that doesn't have one. New projects
+   get their board automatically from `ProjectIndexTemplate`, which builds the
+   same skeleton inline (it can't call this template — see the comment there).
+
+   ⚠️ KEEP IN SYNC with the `createBoard()` function in `ProjectIndexTemplate.md`. */
 const folderPath = tp.file.folder(true);   // e.g. "PROJECTS/Fatigue"
 const folderName = tp.file.folder();       // e.g. "Fatigue"
 

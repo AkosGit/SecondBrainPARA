@@ -52,6 +52,33 @@ async function backlinkSources(sources, ideaFile, ideaTitle) {
   }
   new Notice(`Linked idea to ${sources.length} source note(s)`);
 }
+/* Add a link-only card to the project's kanban board. A card that is nothing
+   but a wikilink renders on the Index as the note's title — see SYSTEM.md §4.
+   The board is the source of truth for status, so the card carries no metadata. */
+async function addBoardCard(folderPath, noteFile, noteTitle) {
+  const board = app.vault.getMarkdownFiles()
+    .filter(f => f.parent?.path === folderPath)
+    .find(f => app.metadataCache.getFileCache(f)?.frontmatter?.Type === "Tasks");
+  if (!board) { new Notice("No board in this project — card skipped."); return; }
+  const list = await tp.system.suggester(
+    ["Backlog", "In Progress", "No card"], ["Backlog", "In Progress", null],
+    false, "Add a card to the board?");
+  if (!list) return;
+  const lines = (await app.vault.read(board)).split("\n");
+  const start = lines.findIndex(l => l.trim() === "## " + list);
+  if (start === -1) { new Notice(`No "${list}" list on the board — card skipped.`); return; }
+  /* Walk to the end of this list, then back up over trailing blank lines so the
+     card lands under the last existing card rather than in the gap below it. */
+  let end = start + 1;
+  while (end < lines.length
+      && !/^##\s/.test(lines[end])
+      && !/^%%\s*kanban:settings/.test(lines[end])) end++;
+  let last = end - 1;
+  while (last > start && lines[last].trim() === "") last--;
+  lines.splice(last + 1, 0, `- [ ] [[${noteFile.path.replace(/\.md$/, "")}|${noteTitle}]]`);
+  await app.vault.modify(board, lines.join("\n"));
+  new Notice(`Added to ${list}: ${noteTitle}`);
+}
 function allFrontmatterTags(prefix) {
   const out = new Set();
   for (const f of app.vault.getMarkdownFiles()) {
@@ -115,6 +142,11 @@ if (noteType === "Idea") {
   const sources = await pickSourceNotes();
   ideaFields = "status: seed\n" + yamlField("source-notes", sources.map(f => wikiLink(f))) + "\n";
   await backlinkSources(sources, tp.config.target_file, title);
+}
+/* A Resource inside a project is a deliverable, so it usually owes a task.
+   Ideas and Sources don't — add those cards by hand if you want them. */
+if (noteType === "Resource") {
+  await addBoardCard(folderPath, tp.config.target_file, title);
 }
 -%>
 ---
