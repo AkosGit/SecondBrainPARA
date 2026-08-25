@@ -3,7 +3,6 @@
   "periodic-notes",
   "templater-obsidian",
   "obsidian-kanban",
-  "homepage",
   "quickadd",
   "obsidian-paste-image-rename",
   "obsidian-git",
@@ -15,5 +14,6 @@
   "better-export-pdf",
   "pdf-plus",
   "modalforms",
-  "system3-relay"
+  "system3-relay",
+  "yaos"
 ]
