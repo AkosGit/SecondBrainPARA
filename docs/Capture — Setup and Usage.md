@@ -21,6 +21,23 @@ The contract every capture must satisfy: frontmatter with `Type: Source`, `readi
 
 ---
 
+## 0. Plugins you need
+
+Everything below — and every dashboard on [[Index]] — depends on six community plugins. Install them from **Settings → Community plugins → Browse**, then apply the settings in the table. All six are already installed and configured in this vault; this section exists so the setup can be rebuilt from scratch, and so you know which switch to check when something silently stops working.
+
+| Plugin | Why it's needed | What to configure |
+|---|---|---|
+| **Dataview** | Every dashboard on `Index.md`, every area/project hub, the reading queue and digestion funnel are Dataview queries. | Turn on **Enable JavaScript Queries** *and* **Enable Inline JavaScript Queries** — the serendipity block and the related-notes footers are `dataviewjs`, not plain `dataview`, and render as raw code blocks without them. Leave the JS keyword at `dataviewjs`. |
+| **Templater** | Stamps the frontmatter contract on every new note. No template, no `Type`/`Parent`/tags — the note skips every query. | **Template folder location:** `Templates`. Turn on **Trigger Templater on new file creation** (this is what makes share-sheet captures self-stamp). Under **Folder templates**, enable them and add one mapping: `Inbox` → `Templates/SourceTemplate.md`. Enable **User System Command Functions** (used by the templates' shell calls). |
+| **QuickAdd** | The two in-vault capture commands — §1 below and §5 at the bottom. | Two **Template** choices: **"New Source"** → `Templates/SourceTemplate.md`, folder `Inbox`; **"New Idea"** → `Templates/QuickIdeaTemplate.md`, folder `IDEAS`. For both, leave "choose folder when creating note" off so there's no folder prompt. Then bind hotkeys in **Settings → Hotkeys**: `Cmd/Ctrl+Shift+S` for New Source, `Cmd/Ctrl+Shift+I` for New Idea. |
+| **Kanban** | Project task boards — one board per project folder, plus the vault-wide boards on [[Boards]]. | Set **Note folder** (new-note location for cards) to `TASKS`. Nothing else; boards carry their own per-board settings in frontmatter. |
+| **Periodic Notes** | Daily notes — the `Type: Daily` half of the system. | Currently **enabled but unconfigured**, so nothing daily works yet. To turn it on: enable **Daily notes**, set format `YYYY-MM-DD`, note folder to a dedicated daily folder, and point the template at a daily template in `Templates`. Skip it if you don't keep a daily note — nothing else in the vault depends on it. |
+| **Find orphaned files and broken links** | Maintenance. Notes that lost their `Parent` link, and wikilinks pointing at deleted or renamed files, are invisible to every dashboard — this is the only thing that surfaces them. | Defaults are fine. Point its output file at a scratch note (not a PARA folder) so its reports don't pollute the queries, and exclude `Templates` and `ARCHIVE` from the scan — templates contain unresolved placeholder links by design. Run **"Create list of unresolved links"** and **"Create list of orphaned files"** from the command palette every few weeks. |
+
+The rest of the enabled plugins are conveniences, not load-bearing: obsidian-git (backup), linter, outliner, various-complements, paste-image-rename, spaced-repetition, pdf-plus and better-export-pdf (PDF reading and highlights, used in the reading loop), modalforms, system3-relay. Full inventory: [[SYSTEM]] §6.
+
+> After changing any plugin setting on disk (rather than in the UI), restart Obsidian — configs load at launch.
+
 ## 1. QuickAdd hotkey (already configured)
 
 Press `Cmd/Ctrl+Shift+S` anywhere in Obsidian → prompted for title, then URL → stamped Source note appears in `Inbox/`. On mobile, add the same command to the toolbar: Settings → Toolbar → add "QuickAdd: New Source".
